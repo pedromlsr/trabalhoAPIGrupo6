@@ -4,7 +4,7 @@ cep varchar(9) NOT NULL,
 rua varchar(100) NOT NULL,
 bairro varchar(50) NOT NULL,
 cidade varchar(30),
-numero INTEGER NOT NULL,
+numero varchar(10) NOT NULL,
 complemento varchar(20),
 uf varchar(2))
 ;
@@ -42,7 +42,7 @@ nome varchar(30) NOT NULL,
 descricao varchar(100),
 qtd_estoque INTEGER NOT NULL,
 data_cadastro DATE,
-valor_unitario FLOAT NOT NULL, 
+valor_unitario NUMERIC(10,2) NOT NULL, 
 imagem varchar(100),
 id_categoria INTEGER, 
 FOREIGN KEY(id_categoria) REFERENCES categoria(id_categoria)
@@ -52,7 +52,7 @@ FOREIGN KEY(id_categoria) REFERENCES categoria(id_categoria)
 CREATE TABLE item_pedido (
 id_item_pedido SERIAL PRIMARY KEY,
 quantidade INTEGER NOT NULL,
-preco_venda INTEGER NOT NULL,
+preco_venda NUMERIC(10,2) NOT NULL,
 percentual_desconto NUMERIC(3,2),
 valor_bruto NUMERIC(10,2),
 valor_liquido NUMERIC(10,2),
