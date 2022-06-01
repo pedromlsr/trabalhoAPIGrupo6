@@ -17,7 +17,7 @@ public class PedidoService {
 	}
 
 	public Pedido findPedidoById(Integer id) {
-		return pedidoRepository.findById(id).isPresent() ? pedidoRepository.findById(id).get() : null;
+		return pedidoRepository.existsById(id) ? pedidoRepository.findById(id).get() : null;
 	}
 
 	public Pedido savePedido(Pedido pedido) {
