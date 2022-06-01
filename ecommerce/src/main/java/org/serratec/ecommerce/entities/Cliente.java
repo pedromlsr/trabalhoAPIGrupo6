@@ -10,6 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -23,12 +27,16 @@ public class Cliente {
 	@Column(name = "id_cliente")
 	private Integer idCliente;
 
+	@NotBlank(message = "O email não pode ficar em branco.")
+	@Email(message = "")
 	@Column(name = "email")
 	private String email;
 
 	@Column(name = "nome_completo")
 	private String nomeCompleto;
 
+	@NotBlank(message = "O cpf não pode ficar em branco.")
+	@CPF(message = "")
 	@Column(name = "cpf")
 	private String cpf;
 
@@ -97,4 +105,5 @@ public class Cliente {
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
 	}
+
 }

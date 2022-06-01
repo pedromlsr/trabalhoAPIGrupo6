@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class ClienteService {
 	@Autowired
 	ClienteRepository clienteRepository;
-	
+
 	public List<Cliente> findAllCliente() {
 		return clienteRepository.findAll();
 	}
@@ -21,6 +21,14 @@ public class ClienteService {
 	}
 
 	public Cliente saveCliente(Cliente cliente) {
+		if (clienteRepository.existsByCpf(cliente.getCpf()) == true) {
+			cliente.setCpf(null);
+			return cliente;
+		}
+		if (clienteRepository.existsByEmail(cliente.getEmail()) == true) {
+			cliente.setEmail(null);
+			return cliente;
+		}
 		return clienteRepository.save(cliente);
 	}
 

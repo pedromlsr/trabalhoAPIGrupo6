@@ -2,7 +2,11 @@ package org.serratec.ecommerce.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.serratec.ecommerce.entities.Cliente;
+import org.serratec.ecommerce.exceptions.CpfException;
+import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,30 +25,35 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClienteController {
 	@Autowired
 	ClienteService clienteService;
-	
+
 	@GetMapping
 	public ResponseEntity<List<Cliente>> findAllCliente() {
 		List<Cliente> clienteList = clienteService.findAllCliente();
 		return new ResponseEntity<>(clienteList, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Cliente> findClienteById(@PathVariable Integer id) {
 		Cliente cliente = clienteService.findClienteById(id);
 		return new ResponseEntity<>(cliente, HttpStatus.OK);
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Cliente> saveCliente(@RequestBody Cliente cliente) {
+	public ResponseEntity<Cliente> saveCliente(@Valid @RequestBody Cliente cliente) {
+		if (clienteService.saveCliente(cliente).getCpf() == null) {
+			throw new CpfException("CPF já existente.");
+		}
+		if (clienteService.saveCliente(cliente).getEmail() == null) {
+			throw new EmailException("Email já existente.");
+		}
 		return new ResponseEntity<>(clienteService.saveCliente(cliente), HttpStatus.CREATED);
 	}
 
 	@PutMapping
-	public ResponseEntity<Cliente> updateCliente(@RequestBody Cliente cliente) {
+	public ResponseEntity<Cliente> updateCliente(@Valid @RequestBody Cliente cliente) {
 		Cliente clienteAtualizado = clienteService.updateCliente(cliente);
 		return new ResponseEntity<>(clienteAtualizado, HttpStatus.OK);
 	}
-
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteClienteById(@PathVariable Integer id) {
@@ -53,4 +62,3 @@ public class ClienteController {
 	}
 
 }
-
