@@ -1,7 +1,9 @@
 package org.serratec.ecommerce.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.serratec.ecommerce.dtos.ClienteDTO;
 import org.serratec.ecommerce.entities.Cliente;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,32 +14,64 @@ public class ClienteService {
 	@Autowired
 	ClienteRepository clienteRepository;
 
-	public List<Cliente> findAllCliente() {
-		return clienteRepository.findAll();
-	}
+	public List<ClienteDTO> findAllCliente() {
+		List<Cliente> listClienteEntidade = clienteRepository.findAll();
+		List<ClienteDTO> listClienteDTO = new ArrayList<ClienteDTO>();
 
-	public Cliente findClienteById(Integer idCliente) {
-		return clienteRepository.findById(idCliente).isPresent() ? clienteRepository.findById(idCliente).get() : null;
-	}
-
-	public Cliente saveCliente(Cliente cliente) {
-		if (clienteRepository.existsByCpf(cliente.getCpf()) == true) {
-			cliente.setCpf(null);
-			return cliente;
+		for (Cliente cliente : listClienteEntidade) {
+			listClienteDTO.add(EntidadeParaDTO(cliente));
 		}
-		if (clienteRepository.existsByEmail(cliente.getEmail()) == true) {
-			cliente.setEmail(null);
-			return cliente;
-		}
-		return clienteRepository.save(cliente);
+		return listClienteDTO;
 	}
 
-	public Cliente updateCliente(Cliente cliente) {
-		return clienteRepository.save(cliente);
+	public ClienteDTO findClienteById(Integer idCliente) {
+		return clienteRepository.findById(idCliente).isPresent() ?
+			EntidadeParaDTO(clienteRepository.findById(idCliente).get()) : null;
+	}
+
+	public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
+		if (clienteRepository.existsByCpf(clienteDTO.getCpf()) == true) {
+			clienteDTO.setCpf(null);
+			return clienteDTO;
+		}
+		if (clienteRepository.existsByEmail(clienteDTO.getEmail()) == true) {
+			clienteDTO.setEmail(null);
+			return clienteDTO;
+		}
+		return EntidadeParaDTO(clienteRepository.save(DTOParaEntidade(clienteDTO)));
+	}
+
+	public ClienteDTO updateCliente(ClienteDTO clienteDTO) {
+		Cliente cliente = DTOParaEntidade(clienteDTO);
+		return EntidadeParaDTO(clienteRepository.save(cliente));
 	}
 
 	public void deleteClienteById(Integer idCliente) {
 		clienteRepository.deleteById(idCliente);
+	}
+
+	private Cliente DTOParaEntidade(ClienteDTO clienteDTO) {
+		Cliente cliente = new Cliente();
+
+		cliente.setEmail(clienteDTO.getEmail());
+		cliente.setNomeCompleto(clienteDTO.getNomeCompleto());
+		cliente.setCpf(clienteDTO.getCpf());
+		cliente.setTelefone(clienteDTO.getTelefone());
+		cliente.setDataNascimento(clienteDTO.getDataNascimento());
+
+		return cliente;
+	}
+
+	private ClienteDTO EntidadeParaDTO(Cliente cliente) {
+		ClienteDTO clienteDTO = new ClienteDTO();
+
+		clienteDTO.setEmail(cliente.getEmail());
+		clienteDTO.setNomeCompleto(cliente.getNomeCompleto());
+		clienteDTO.setCpf(cliente.getCpf());
+		clienteDTO.setTelefone(cliente.getTelefone());
+		clienteDTO.setDataNascimento(cliente.getDataNascimento());
+
+		return clienteDTO;
 	}
 
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.serratec.ecommerce.entities.Cliente;
+import org.serratec.ecommerce.dtos.ClienteDTO;
 import org.serratec.ecommerce.exceptions.CpfException;
 import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.services.ClienteService;
@@ -27,32 +27,29 @@ public class ClienteController {
 	ClienteService clienteService;
 
 	@GetMapping
-	public ResponseEntity<List<Cliente>> findAllCliente() {
-		List<Cliente> clienteList = clienteService.findAllCliente();
-		return new ResponseEntity<>(clienteList, HttpStatus.OK);
+	public ResponseEntity<List<ClienteDTO>> findAllCliente() {
+		return new ResponseEntity<>(clienteService.findAllCliente(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Cliente> findClienteById(@PathVariable Integer id) {
-		Cliente cliente = clienteService.findClienteById(id);
-		return new ResponseEntity<>(cliente, HttpStatus.OK);
+	public ResponseEntity<ClienteDTO> findClienteById(@PathVariable Integer id) {
+		return new ResponseEntity<>(clienteService.findClienteById(id), HttpStatus.OK);
 	}
 
 	@PostMapping
-	public ResponseEntity<Cliente> saveCliente(@Valid @RequestBody Cliente cliente) {
-		if (clienteService.saveCliente(cliente).getCpf() == null) {
+	public ResponseEntity<ClienteDTO> saveCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
+		if (clienteService.saveCliente(clienteDTO).getCpf() == null) {
 			throw new CpfException("CPF já existente.");
 		}
-		if (clienteService.saveCliente(cliente).getEmail() == null) {
+		if (clienteService.saveCliente(clienteDTO).getEmail() == null) {
 			throw new EmailException("Email já existente.");
 		}
-		return new ResponseEntity<>(clienteService.saveCliente(cliente), HttpStatus.CREATED);
+		return new ResponseEntity<>(clienteService.saveCliente(clienteDTO), HttpStatus.CREATED);
 	}
 
 	@PutMapping
-	public ResponseEntity<Cliente> updateCliente(@Valid @RequestBody Cliente cliente) {
-		Cliente clienteAtualizado = clienteService.updateCliente(cliente);
-		return new ResponseEntity<>(clienteAtualizado, HttpStatus.OK);
+	public ResponseEntity<ClienteDTO> updateCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
+		return new ResponseEntity<>(clienteService.updateCliente(clienteDTO), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
