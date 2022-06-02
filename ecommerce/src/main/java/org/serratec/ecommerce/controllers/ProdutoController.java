@@ -4,7 +4,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.serratec.ecommerce.entities.Produto;
+import org.serratec.ecommerce.dtos.ProdutoGetDTO;
+import org.serratec.ecommerce.dtos.ProdutoPostDTO;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.services.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,69 +26,80 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/produto")
 public class ProdutoController {
+	
 	@Autowired
-	ProdutoService produtoService;  
+	ProdutoService produtoService;
 
 	@GetMapping
-	public ResponseEntity<List<Produto>> findAllProduto() {
-		List<Produto> produtoList = produtoService.findAllProduto();
+	public ResponseEntity<List<ProdutoGetDTO>> findAllProduto() {
+		List<ProdutoGetDTO> produtoList = produtoService.findAllProduto();
+		if(produtoList.isEmpty()) {
+			throw new NoSuchElementFoundException("Não foi encontrado nenhum produto");
+		}
 		return new ResponseEntity<>(produtoList, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Produto> findProdutoById(@PathVariable Integer id) {
-		Produto produto = produtoService.findProdutoById(id);
-		if(produto==null) {
+	public ResponseEntity<ProdutoGetDTO> findProdutoById(@PathVariable Integer id) {
+		ProdutoGetDTO produtoDto = produtoService.findProdutoById(id);
+		if (produtoDto == null) {
 			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
 		}
-		return new ResponseEntity<>(produto, HttpStatus.OK);
+		return new ResponseEntity<>(produtoDto, HttpStatus.OK);
 	}
 
 	@PostMapping
-	public ResponseEntity<Produto> saveProduto(@Valid @RequestBody Produto produto) {
-		Produto produtoNovo = produtoService.findProdutoByDescricao(produto.getDescricaoProduto());
-		if(produtoNovo!=null) {
+	public ResponseEntity<ProdutoGetDTO> saveProdutoDTO(@Valid @RequestBody ProdutoPostDTO produtoDto) {
+		ProdutoGetDTO produtoNovo = produtoService.findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
+		if (produtoNovo != null) {
 			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException("O produto de id: " + produtoNovo.getIdProduto() + " já possui essa descrição");
+			throw new NoSuchElementFoundException(
+					"O produto de id: " + produtoNovo.getIdProduto() + " já possui essa descrição");
 		}
-		return new ResponseEntity<>(produtoService.saveProduto(produto), HttpStatus.CREATED);
-		
+		return new ResponseEntity<>(produtoService.saveProdutoDTO(produtoDto), HttpStatus.CREATED);
+
 	}
 	
-	@PostMapping("/com-foto")
-	public ResponseEntity<Produto> saveProdutoComFoto(@Valid @RequestBody Produto produto) {
-		return new ResponseEntity<>(produtoService.saveProduto(produto), HttpStatus.CREATED);
-	}
-
 	@PostMapping(value = "/com-foto", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.MULTIPART_FORM_DATA_VALUE })
-	public ResponseEntity<Produto> saveProdutoComFoto(@RequestPart("produto") String produto,
+	public ResponseEntity<ProdutoGetDTO> saveProdutoDtoComFoto(@RequestPart("produto") String produto,
 			@RequestPart("file") MultipartFile file) throws Exception {
-
-		Produto novoProduto = produtoService.convertStringToProduct(produto);
-		Produto produtoBD = produtoService.findProdutoByDescricao(novoProduto.getDescricaoProduto());
 		
-		if(produtoBD!= null) {
+		ProdutoPostDTO produtoDto = produtoService.convertStringToDto(produto);
+		ProdutoGetDTO produtoBD = produtoService.findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
+		
+		if (produtoBD != null) {
 			// Precisa trocar o tipo de Exception
-						throw new NoSuchElementFoundException("O produto de id: " + produtoBD.getIdProduto() + " já possui essa descrição");
-		}		
-		return new ResponseEntity<>(produtoService.saveProdutoComFoto(novoProduto, file), HttpStatus.CREATED);
+			throw new NoSuchElementFoundException(
+					"O produto de id: " + produtoBD.getIdProduto() + " já possui essa descrição");
+		}
+		return new ResponseEntity<>(produtoService.saveProdutoDtoComFoto(produtoDto, file), HttpStatus.CREATED);
+	}
+
+	@PutMapping
+	public ResponseEntity<ProdutoGetDTO> updateProduto(@Valid @RequestBody ProdutoPostDTO produtoDto) {
+		if (produtoDto.getIdProduto() == null) {
+			// Precisa trocar o tipo de Exception
+			throw new NoSuchElementFoundException("Não foi informado um ID");
+		}
+		ProdutoGetDTO produtoAtualizado = produtoService.updateProduto(produtoDto);
+		return new ResponseEntity<>(produtoAtualizado, HttpStatus.OK);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Produto> updateProdutoById(@PathVariable Integer id,@RequestBody Produto produto) {
-		if(id==null) {
+	public ResponseEntity<ProdutoGetDTO> updateProdutoById(@PathVariable Integer id, @Valid @RequestBody ProdutoPostDTO produtoDto) {
+		if (id == null) {
 			// Precisa trocar o tipo de Exception
 			throw new NoSuchElementFoundException("Não foi informado um ID");
-		}		
-		Produto produtoAtualizado = produtoService.updateProdutoById(produtoService.findProdutoById(id), produto);
+		}
+		ProdutoGetDTO produtoAtualizado = produtoService.updateProdutoById(produtoDto,id);
 		return new ResponseEntity<>(produtoAtualizado, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteProdutoById(@PathVariable Integer id) {
-		Produto produto = produtoService.findProdutoById(id);
-		if(produto==null) {
+		ProdutoGetDTO produtoDto = produtoService.findProdutoById(id);
+		if (produtoDto == null) {
 			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
 		}
 		produtoService.deleteProdutoById(id);

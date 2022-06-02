@@ -2,16 +2,15 @@ package org.serratec.ecommerce.dtos;
 
 import java.time.LocalDate;
 
-public class ProdutoDTO {
+public class ProdutoGetDTO {
 
 	private Integer idProduto;
 	private String nomeProduto;
 	private String descricaoProduto;
 	private Integer qtdEstoque;
-	private LocalDate dataCadastro;
 	private Double valorUnitario;
-	private String nomeImagemProduto;
-	// private CategoriaDTO categoria;
+	private LocalDate dataCadastro;	
+	// private CategoriaDTO idCategoria;
 
 	public Integer getIdProduto() {
 		return idProduto;
@@ -45,28 +44,20 @@ public class ProdutoDTO {
 		this.qtdEstoque = qtdEstoque;
 	}
 
-	public LocalDate getDataCadastro() {
-		return dataCadastro;
-	}
-
-	public void setDataCadastro(LocalDate dataCadastro) {
-		this.dataCadastro = dataCadastro;
-	}
-
 	public Double getValorUnitario() {
 		return valorUnitario;
 	}
 
 	public void setValorUnitario(Double valorUnitario) {
 		this.valorUnitario = valorUnitario;
+	}	
+
+	public LocalDate getDataCadastro() {
+		return dataCadastro;
 	}
 
-	public String getNomeImagemProduto() {
-		return nomeImagemProduto;
-	}
-
-	public void setNomeImagemProduto(String nomeImagemProduto) {
-		this.nomeImagemProduto = nomeImagemProduto;
+	public void setDataCadastro(LocalDate dataCadastro) {
+		this.dataCadastro = dataCadastro;
 	}
 
 }

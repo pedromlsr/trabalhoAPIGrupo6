@@ -2,9 +2,11 @@ package org.serratec.ecommerce.services;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.serratec.ecommerce.dtos.ProdutoDTO;
+import org.serratec.ecommerce.dtos.ProdutoGetDTO;
+import org.serratec.ecommerce.dtos.ProdutoPostDTO;
 import org.serratec.ecommerce.entities.Produto;
 import org.serratec.ecommerce.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,119 +17,123 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ProdutoService {
-	
+
 	@Autowired
 	ProdutoRepository produtoRepository;
-	
-	@Autowired 
+
+	@Autowired
 	ArquivoToService arquivoToService;
 
-	public List<Produto> findAllProduto() {
-		return produtoRepository.findAll();
+	public List<ProdutoGetDTO> findAllProduto() {
+		List<ProdutoGetDTO> listProdutoDto = new ArrayList<ProdutoGetDTO>();
+		List<Produto> listProduto = produtoRepository.findAll();
+		for (Produto produto : listProduto) {
+			listProdutoDto.add(convertEntityToDto(produto));
+		}
+		return listProdutoDto;
 	}
 
-	public Produto findProdutoById(Integer id) {
-		return produtoRepository.findById(id).isPresent() ? produtoRepository.findById(id).get() : null;
-	}
-	
-	public Produto findProdutoByDescricao(String descricaoProduto) {
-		return produtoRepository.findByDescricaoProdutoIgnoreCase(descricaoProduto);
-	}
-
-	public Produto saveProduto(Produto produto) {
-		return produtoRepository.save(produto);
-	}
-	
-	public Produto convertStringToProduct(String produtoString) {
+	public ProdutoGetDTO findProdutoById(Integer id) {
+		return produtoRepository.findById(id).isPresent() ? convertEntityToDto(produtoRepository.findById(id).get()) : null;
 		
-		Produto produtoConvertido = new Produto();
+	}
+	
+	public ProdutoGetDTO findProdutoByDescricaoDto(String descricaoProduto) {
+		Produto produto = produtoRepository.findByDescricaoProdutoIgnoreCase(descricaoProduto);
+		if(produto==null) {
+			return null;
+		}
+		return convertEntityToDto(produto);
+	}
+
+	public ProdutoGetDTO saveProdutoDTO(ProdutoPostDTO produtoDto) {
+		
+		Produto produto = new Produto();
+		produto = convertDtoToEntity(produtoDto);
+		produto.setDataCadastro(LocalDate.now());
+		return convertEntityToDto(produtoRepository.save(produto));
+	}
+
+	public ProdutoPostDTO convertStringToDto(String produtoString) {
+
+		ProdutoPostDTO produtoDtoConvertido = new ProdutoPostDTO();
 		try {
 			ObjectMapper objMapper = new ObjectMapper();
-			produtoConvertido = objMapper.readValue(produtoString, Produto.class);
-			
+			produtoDtoConvertido = objMapper.readValue(produtoString, ProdutoPostDTO.class);
+
 		} catch (IOException e) {
 			System.out.println("Ocorreu um erro na conversão");
 		}
-		
-		return produtoConvertido;
+
+		return produtoDtoConvertido;
 	}
-	
-	public Produto saveProdutoComFoto(Produto produto, MultipartFile file) throws Exception {
-				
-		Produto produtoBD = produtoRepository.save(produto);
+
+	public ProdutoGetDTO saveProdutoDtoComFoto(ProdutoPostDTO produtoDto, MultipartFile file) throws Exception {
+
+		Produto produtoBD = convertDtoToEntity(produtoDto);
+		produtoRepository.save(produtoBD);
 		produtoBD.setNomeImagemProduto(produtoBD.getIdProduto() + "_" + file.getOriginalFilename());
 		produtoBD.setDataCadastro(LocalDate.now());
 		Produto produtoAtualizado = produtoRepository.save(produtoBD);
-		
+
 		arquivoToService.criarArquivo(produtoBD.getIdProduto() + "_" + file.getOriginalFilename(), file);
-		
-		
-		return produtoAtualizado;
+		ProdutoGetDTO produtoGetDto = convertEntityToDto(produtoAtualizado);
+
+		return produtoGetDto;
 	}
 
-	public Produto updateProduto(Produto produto) {
-		produto.setDataCadastro(LocalDate.now());
-		return produtoRepository.save(produto);
+	public ProdutoGetDTO updateProduto(ProdutoPostDTO produtoDto) {
+		Produto produto = convertDtoToEntity(produtoDto);
+		produtoRepository.save(produto);
+		return convertEntityToDto(produto);
+
 	}
 
-	//Pode atualizar passando somente um dos campos
-	
-	public Produto updateProdutoById(Produto produtoBD, Produto produto) {
+	public ProdutoGetDTO updateProdutoById(ProdutoPostDTO produtoDto, Integer id) {
 		Produto produtoAtualizado = new Produto();
+		ProdutoGetDTO produtoBD = findProdutoById(id);
 
-		produtoAtualizado.setIdProduto(produtoBD.getIdProduto());
+		produtoAtualizado.setIdProduto(id);
+		produtoAtualizado.setNomeProduto(produtoDto.getNomeProduto());
+		produtoAtualizado.setDescricaoProduto(produtoDto.getDescricaoProduto());
+		produtoAtualizado.setValorUnitario(produtoDto.getValorUnitario());
 		
-		if (produto.getNomeProduto() != null) {
-			produtoAtualizado.setNomeProduto(produto.getNomeProduto());
+		if(produtoBD!=null) {
+		produtoAtualizado.setDataCadastro(produtoBD.getDataCadastro());
 		} else {
-			produtoAtualizado.setNomeProduto(produtoBD.getNomeProduto());
+			produtoAtualizado.setDataCadastro(LocalDate.now());
 		}
-		if (produto.getDescricaoProduto() != null) {
-			produtoAtualizado.setDescricaoProduto(produto.getDescricaoProduto());
-		} else {
-			produtoAtualizado.setDescricaoProduto(produtoBD.getDescricaoProduto());
-		}
-		if (produto.getValorUnitario() != null) {
-			produtoAtualizado.setValorUnitario(produto.getValorUnitario());
-		} else {
-			produtoAtualizado.setValorUnitario(produtoBD.getValorUnitario());
-		}
-		if (produto.getCategoria()!=null) {
-			produtoAtualizado.setCategoria(produto.getCategoria());
-		} else {
-			produtoAtualizado.setCategoria(produtoBD.getCategoria());
-		}
-		if (produto.getQtdEstoque() != null) {
-			produtoAtualizado.setQtdEstoque(produto.getQtdEstoque());
+//		produtoAtualizado.setCategoria(produtoDto.getCategoria());
+
+		if (produtoDto.getQtdEstoque() != null) {
+			produtoAtualizado.setQtdEstoque(produtoDto.getQtdEstoque());
 		} else {
 			produtoAtualizado.setQtdEstoque(produtoBD.getQtdEstoque());
 		}
-		produtoAtualizado.setDataCadastro(LocalDate.now());
-		produtoAtualizado.setNomeImagemProduto(produto.getNomeImagemProduto());
 
-		return produtoRepository.save(produtoAtualizado);
+		return convertEntityToDto(produtoRepository.save(produtoAtualizado));
+
 	}
 
 	public void deleteProdutoById(Integer id) {
 		produtoRepository.deleteById(id);
 	}
-	
-	public Produto convertDtoToEntity(ProdutoDTO produtoDto) {
+
+	public Produto convertDtoToEntity(ProdutoPostDTO produtoDto) {
 		Produto produto = new Produto();
-		
+
 		produto.setIdProduto(produtoDto.getIdProduto());
 		produto.setNomeProduto(produtoDto.getNomeProduto());
 		produto.setDescricaoProduto(produtoDto.getDescricaoProduto());
 		produto.setValorUnitario(produtoDto.getValorUnitario());
 		produto.setQtdEstoque(produtoDto.getQtdEstoque());
-		produto.setDataCadastro(produtoDto.getDataCadastro());
 		
 		return produto;
 	}
-	
-	public ProdutoDTO convertEntityToDto(Produto produto) {
-		ProdutoDTO produtoDto = new ProdutoDTO();
-		
+
+	public ProdutoGetDTO convertEntityToDto(Produto produto) {
+		ProdutoGetDTO produtoDto = new ProdutoGetDTO();
+
 		produtoDto.setIdProduto(produto.getIdProduto());
 		produtoDto.setNomeProduto(produto.getNomeProduto());
 		produtoDto.setDescricaoProduto(produto.getDescricaoProduto());
@@ -137,5 +143,5 @@ public class ProdutoService {
 		
 		return produtoDto;
 	}
-	
+
 }
