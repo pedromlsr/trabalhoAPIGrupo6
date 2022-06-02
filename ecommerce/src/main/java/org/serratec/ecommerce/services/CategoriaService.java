@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.serratec.ecomercio.dtos.CategoriaDTO;
+import org.serratec.ecommerce.dtos.CategoriaDTO;
 
 
 @Service
@@ -60,25 +60,7 @@ public class CategoriaService {
 		} catch (IOException e) {
 			System.out.println("Ocorreu um erro na conversão");
 		}
-
-		Categoria categoriaBD = categoriaRepository.save(categoriaConvertida);
-		categoriaBD.setNomeImagem(categoriaBD.getIdCategoria() + "_" + file.getOriginalFilename());
-		Categoria categoriaAtualizada = categoriaRepository.save(categoriaBD);
-
-		try {
-			arquivoService.criarArquivo(categoriaBD.getIdCategoria() + "_" + file.getOriginalFilename(), file);
-		} catch (Exception e) {
-			throw new Exception("Ocorreu um erro ao tentar copiar o arquivo - " + e.getStackTrace());
-		}
-		
-		//cuidado para definir um endereco 
-		String corpoEmail = "Foi cadastrada uma nova categoria" + categoriaAtualizada.toString();
-		emailService.enviarEmailTexto("teste@teste.com", "Cadastro de categoria", corpoEmail);
-
-		return categoriaAtualizada;
-
-	}
-
+	
 	public Categoria updateCategoria(Categoria categoria) {
 		return categoriaRepository.save(categoria);
 	}

@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.serratec.ecomercio.dtos.CategoriaDTO;
+import org.serratec.ecommerce.dtos.CategoriaDTO;
 import org.serratec.ecommerce.entities.Categoria;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.services.CategoriaService;
