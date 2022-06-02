@@ -53,11 +53,11 @@ public class PedidoController {
 			throw new NoSuchElementFoundException(
 					"Não foi possível atualizar. O Pedido de id = " + idPedido + " não foi encontrado.");
 		}
-		if (idStatus != 2 & idStatus != 3) {
+		if (idStatus != 2 && idStatus != 3) {
 			// Criar exception customizada
 			throw new NoSuchElementFoundException("Esta requisição só pode ser efetuada para os status de id 2 e 3 (Enviado e Entregue).");
 		}
-		if (idStatus == 3 & (pedidoService.findPedidoById(idPedido).getDataEnvio() == null)) {
+		if (idStatus == 3 && (pedidoService.findPedidoById(idPedido).getDataEnvio() == null)) {
 			// Criar exception customizada
 			throw new NoSuchElementFoundException("Não é possível definir como entregue um pedido que ainda não foi enviado.");
 		}

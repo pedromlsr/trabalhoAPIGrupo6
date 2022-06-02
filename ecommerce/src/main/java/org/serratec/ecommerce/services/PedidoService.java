@@ -8,6 +8,7 @@ import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.repositories.ClienteRepository;
+import org.serratec.ecommerce.repositories.ItemPedidoRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
 import org.serratec.ecommerce.repositories.StatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class PedidoService {
 	@Autowired
 	StatusRepository statusRepository;
 
+	@Autowired
+	ItemPedidoRepository itemPedidoRepository;
+	
 	public List<PedidoResDTO> findAllPedido() {
 		if (pedidoRepository.findAll().isEmpty()) {
 			return null;
@@ -48,6 +52,11 @@ public class PedidoService {
 		pedido.setStatus(statusRepository.findById(1).get());
 		pedido.setCliente(clienteRepository.findById(pedidoReqDTO.getIdCliente()).get());
 
+//		ItemPedido itemPedido = new ItemPedido();
+//		
+//		itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
+//		itemPedido.setValorLiquido(itemPedido.getValorBruto() - (itemPedido.getValorBruto() * itemPedido.getPercentualDesconto()));
+		
 		return convertEntityToDTO(pedidoRepository.save(pedido));
 	}
 
@@ -64,9 +73,7 @@ public class PedidoService {
 			pedido.setDataEntrega(LocalDate.now());
 		}
 
-		pedidoRepository.save(pedido);
-
-		return convertEntityToDTO(pedido);
+		return convertEntityToDTO(pedidoRepository.save(pedido));
 	}
 
 	public Pedido atualizarEnvioPedido(Pedido pedido) {

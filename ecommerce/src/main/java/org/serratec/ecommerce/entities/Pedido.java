@@ -1,6 +1,7 @@
 package org.serratec.ecommerce.entities;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -44,8 +46,8 @@ public class Pedido {
 	@JoinColumn(name = "id_cliente", referencedColumnName = "id_cliente")
 	private Cliente cliente;
 
-//	@OneToMany(mappedBy = "pedido")
-//	private List<ItemPedido> itemPedidoList;
+	@OneToMany(mappedBy = "pedido")
+	private List<ItemPedido> itemPedidoList;
 
 	public Integer getIdPedido() {
 		return idPedido;
