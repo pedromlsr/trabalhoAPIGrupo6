@@ -35,6 +35,7 @@ public class Produto {
 	private String descricaoProduto;
 	
 	@Column(name = "qtd_estoque")
+	@NotNull(message="A quantidade de produto em estoque não pode estar em branco")
 	private Integer qtdEstoque;
 	
 	@Column(name = "data_cadastro")

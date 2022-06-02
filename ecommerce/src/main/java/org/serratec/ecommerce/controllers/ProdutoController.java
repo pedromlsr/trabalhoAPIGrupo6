@@ -83,6 +83,11 @@ public class ProdutoController {
 			throw new NoSuchElementFoundException("Não foi informado um ID");
 		}
 		ProdutoGetDTO produtoAtualizado = produtoService.updateProduto(produtoDto);
+		if(produtoAtualizado==null) {
+			// Precisa trocar o tipo de Exception
+			throw new NoSuchElementFoundException(
+					"Já existe um produto cadastrado com essa descrição");
+		}
 		return new ResponseEntity<>(produtoAtualizado, HttpStatus.OK);
 	}
 	
@@ -93,11 +98,17 @@ public class ProdutoController {
 			throw new NoSuchElementFoundException("Não foi informado um ID");
 		}
 		ProdutoGetDTO produtoAtualizado = produtoService.updateProdutoById(produtoDto,id);
+		if(produtoAtualizado==null) {
+			// Precisa trocar o tipo de Exception
+			throw new NoSuchElementFoundException(
+					"Já existe um produto cadastrado com essa descrição");
+		}
 		return new ResponseEntity<>(produtoAtualizado, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteProdutoById(@PathVariable Integer id) {
+
 		ProdutoGetDTO produtoDto = produtoService.findProdutoById(id);
 		if (produtoDto == null) {
 			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);

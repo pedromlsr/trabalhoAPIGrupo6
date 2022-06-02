@@ -13,6 +13,7 @@ public class ProdutoPostDTO {
 	@NotBlank(message="A descrição do produto não pode estar em branco")
 	private String descricaoProduto;
 	
+	@NotNull(message="A quantidade de produto em estoque não pode estar em branco")
 	private Integer qtdEstoque;	
 	
 	@NotNull(message="O valor do produto não pode estar em branco")

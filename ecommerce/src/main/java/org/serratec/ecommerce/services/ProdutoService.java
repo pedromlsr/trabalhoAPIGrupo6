@@ -34,22 +34,21 @@ public class ProdutoService {
 	}
 
 	public ProdutoGetDTO findProdutoById(Integer id) {
-		return produtoRepository.findById(id).isPresent() ? convertEntityToDto(produtoRepository.findById(id).get()) : null;
-		
+		return produtoRepository.findById(id).isPresent() ? convertEntityToDto(produtoRepository.findById(id).get())
+				: null;
 	}
-	
+
 	public ProdutoGetDTO findProdutoByDescricaoDto(String descricaoProduto) {
 		Produto produto = produtoRepository.findByDescricaoProdutoIgnoreCase(descricaoProduto);
-		if(produto==null) {
+		if (produto == null) {
 			return null;
 		}
 		return convertEntityToDto(produto);
 	}
 
 	public ProdutoGetDTO saveProdutoDTO(ProdutoPostDTO produtoDto) {
-		
-		Produto produto = new Produto();
-		produto = convertDtoToEntity(produtoDto);
+
+		Produto produto = convertDtoToEntity(produtoDto);
 		produto.setDataCadastro(LocalDate.now());
 		return convertEntityToDto(produtoRepository.save(produto));
 	}
@@ -83,6 +82,10 @@ public class ProdutoService {
 	}
 
 	public ProdutoGetDTO updateProduto(ProdutoPostDTO produtoDto) {
+		ProdutoGetDTO produtoBD = findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
+		if (produtoBD != null && produtoBD.getIdProduto()!=produtoDto.getIdProduto()) {
+			return null;
+		}
 		Produto produto = convertDtoToEntity(produtoDto);
 		produtoRepository.save(produto);
 		return convertEntityToDto(produto);
@@ -90,21 +93,26 @@ public class ProdutoService {
 	}
 
 	public ProdutoGetDTO updateProdutoById(ProdutoPostDTO produtoDto, Integer id) {
+		
+		ProdutoGetDTO produtoBD = findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
+		if (produtoBD != null && produtoBD.getIdProduto()!=id) {
+			return null;
+		}
+		
 		Produto produtoAtualizado = new Produto();
-		ProdutoGetDTO produtoBD = findProdutoById(id);
+		produtoBD = findProdutoById(id);
 
 		produtoAtualizado.setIdProduto(id);
 		produtoAtualizado.setNomeProduto(produtoDto.getNomeProduto());
 		produtoAtualizado.setDescricaoProduto(produtoDto.getDescricaoProduto());
 		produtoAtualizado.setValorUnitario(produtoDto.getValorUnitario());
-		
-		if(produtoBD!=null) {
-		produtoAtualizado.setDataCadastro(produtoBD.getDataCadastro());
+//		produtoAtualizado.setCategoria(produtoDto.getCategoria());
+
+		if (produtoBD != null) {
+			produtoAtualizado.setDataCadastro(produtoBD.getDataCadastro());
 		} else {
 			produtoAtualizado.setDataCadastro(LocalDate.now());
 		}
-//		produtoAtualizado.setCategoria(produtoDto.getCategoria());
-
 		if (produtoDto.getQtdEstoque() != null) {
 			produtoAtualizado.setQtdEstoque(produtoDto.getQtdEstoque());
 		} else {
@@ -127,7 +135,7 @@ public class ProdutoService {
 		produto.setDescricaoProduto(produtoDto.getDescricaoProduto());
 		produto.setValorUnitario(produtoDto.getValorUnitario());
 		produto.setQtdEstoque(produtoDto.getQtdEstoque());
-		
+
 		return produto;
 	}
 
@@ -140,7 +148,7 @@ public class ProdutoService {
 		produtoDto.setValorUnitario(produto.getValorUnitario());
 		produtoDto.setQtdEstoque(produto.getQtdEstoque());
 		produtoDto.setDataCadastro(produto.getDataCadastro());
-		
+
 		return produtoDto;
 	}
 
