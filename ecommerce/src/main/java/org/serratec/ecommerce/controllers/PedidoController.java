@@ -1,9 +1,9 @@
 package org.serratec.ecommerce.controllers;
 
-import java.util.Date;
 import java.util.List;
 
-import org.serratec.ecommerce.entities.Pedido;
+import org.serratec.ecommerce.dtos.PedidoReqDTO;
+import org.serratec.ecommerce.dtos.PedidoResDTO;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.services.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,47 +25,44 @@ public class PedidoController {
 	PedidoService pedidoService;
 
 	@GetMapping
-	public ResponseEntity<List<Pedido>> findAllPedido() {
-		List<Pedido> pedidoList = pedidoService.findAllPedido();
-
-		if (pedidoList.isEmpty()) {
+	public ResponseEntity<List<PedidoResDTO>> findAllPedido() {
+		if (pedidoService.findAllPedido() == null) {
 			throw new NoSuchElementFoundException("Nenhum pedido encontrado.");
 		}
 
-		return new ResponseEntity<>(pedidoList, HttpStatus.OK);
+		return new ResponseEntity<>(pedidoService.findAllPedido(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Pedido> findPedidoById(@PathVariable Integer id) {
-		Pedido pedido = pedidoService.findPedidoById(id);
-		if (pedido == null) {
+	public ResponseEntity<PedidoResDTO> findPedidoById(@PathVariable Integer id) {
+		if (pedidoService.findPedidoById(id) == null) {
 			throw new NoSuchElementFoundException("O Pedido de id = " + id + " não foi encontrado.");
 		}
 
-		return new ResponseEntity<>(pedido, HttpStatus.OK);
+		return new ResponseEntity<>(pedidoService.findPedidoById(id), HttpStatus.OK);
 	}
 
 	@PostMapping
-	public ResponseEntity<Pedido> savePedido(@RequestBody Pedido pedido) {
-		Date date = new Date();
-		
-		if (pedido.getDataPedido() != null) {
-			if (pedido.getDataPedido().before(date)) {
-				return new ResponseEntity<>(pedidoService.savePedido(pedido), HttpStatus.BAD_REQUEST);
-			}
-		}
-		
-		return new ResponseEntity<>(pedidoService.savePedido(pedido), HttpStatus.CREATED);
+	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
+		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
 	}
-
-	@PutMapping
-	public ResponseEntity<Pedido> updatePedido(@RequestBody Pedido pedido) {
-		if (pedidoService.findPedidoById(pedido.getIdPedido()) == null) {
-			throw new NoSuchElementFoundException("Não foi possível atualizar. O Pedido de id = "
-					+ pedido.getIdPedido() + " não foi encontrado.");
+	
+	@PutMapping("/{idPedido}/{idStatus}")
+	public ResponseEntity<PedidoResDTO> updatePedido(@PathVariable Integer idPedido, @PathVariable Integer idStatus) {
+		if (pedidoService.findPedidoById(idPedido) == null) {
+			throw new NoSuchElementFoundException(
+					"Não foi possível atualizar. O Pedido de id = " + idPedido + " não foi encontrado.");
 		}
-		
-		return new ResponseEntity<>(pedidoService.updatePedido(pedido), HttpStatus.OK);
+		if (idStatus != 2 & idStatus != 3) {
+			// Criar exception customizada
+			throw new NoSuchElementFoundException("Esta requisição só pode ser efetuada para os status de id 2 e 3 (Enviado e Entregue).");
+		}
+		if (idStatus == 3 & (pedidoService.findPedidoById(idPedido).getDataEnvio() == null)) {
+			// Criar exception customizada
+			throw new NoSuchElementFoundException("Não é possível definir como entregue um pedido que ainda não foi enviado.");
+		}
+
+		return new ResponseEntity<>(pedidoService.updatePedido(idPedido, idStatus), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
@@ -74,7 +71,7 @@ public class PedidoController {
 			throw new NoSuchElementFoundException(
 					"Não foi possível excluir. O Pedido de id = " + id + " não foi encontrado.");
 		}
-		
+
 		pedidoService.deletePedidoById(id);
 		return new ResponseEntity<>("O Pedido de id = " + id + " foi excluído com sucesso.", HttpStatus.OK);
 	}
