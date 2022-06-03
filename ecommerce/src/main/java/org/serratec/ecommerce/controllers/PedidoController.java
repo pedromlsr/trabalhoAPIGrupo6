@@ -34,16 +34,16 @@ public class PedidoController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<PedidoResDTO> findPedidoById(@PathVariable Integer id) {
-		if (pedidoService.findPedidoById(id) == null) {
+	public ResponseEntity<PedidoResDTO> findPedidoByIdDTO(@PathVariable Integer id) {
+		if (pedidoService.findPedidoByIdDTO(id) == null) {
 			throw new NoSuchElementFoundException("O Pedido de id = " + id + " não foi encontrado.");
 		}
 
-		return new ResponseEntity<>(pedidoService.findPedidoById(id), HttpStatus.OK);
+		return new ResponseEntity<>(pedidoService.findPedidoByIdDTO(id), HttpStatus.OK);
 	}
 
 	@PostMapping
-	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
+	public ResponseEntity<PedidoReqDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
 		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
 	}
 	

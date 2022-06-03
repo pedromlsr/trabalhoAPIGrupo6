@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
+import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.serratec.ecommerce.repositories.ItemPedidoRepository;
@@ -28,6 +29,9 @@ public class PedidoService {
 	@Autowired
 	ItemPedidoRepository itemPedidoRepository;
 	
+	@Autowired
+	ItemPedidoService itemPedidoService;
+	
 	public List<PedidoResDTO> findAllPedido() {
 		if (pedidoRepository.findAll().isEmpty()) {
 			return null;
@@ -41,23 +45,27 @@ public class PedidoService {
 		}
 	}
 
-	public PedidoResDTO findPedidoById(Integer id) {
+	public Pedido findPedidoById(Integer id) {
+		return pedidoRepository.existsById(id) ? pedidoRepository.findById(id).get() : null;
+	}
+
+	public PedidoResDTO findPedidoByIdDTO(Integer id) {
 		return pedidoRepository.existsById(id) ? convertEntityToDTO(pedidoRepository.findById(id).get()) : null;
 	}
 
-	public PedidoResDTO savePedido(PedidoReqDTO pedidoReqDTO) {
+	public PedidoReqDTO savePedido(PedidoReqDTO pedidoReqDTO) {
 		Pedido pedido = new Pedido();
 
 		pedido.setDataPedido(LocalDate.now());
 		pedido.setStatus(statusRepository.findById(1).get());
 		pedido.setCliente(clienteRepository.findById(pedidoReqDTO.getIdCliente()).get());
-
-//		ItemPedido itemPedido = new ItemPedido();
-//		
-//		itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
-//		itemPedido.setValorLiquido(itemPedido.getValorBruto() - (itemPedido.getValorBruto() * itemPedido.getPercentualDesconto()));
 		
-		return convertEntityToDTO(pedidoRepository.save(pedido));
+		Pedido pedidoSave = pedidoRepository.save(pedido);
+		pedidoReqDTO.setIdPedido(pedidoSave.getIdPedido());
+		
+		PedidoReqDTO novoPedidoReqDTO = itemPedidoService.salvarItemPedido(pedidoReqDTO);
+		
+		return novoPedidoReqDTO;
 	}
 
 	public PedidoResDTO updatePedido(Integer idPedido, Integer idStatus) {

@@ -40,8 +40,8 @@ public class ProdutoController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ProdutoGetDTO> findProdutoById(@PathVariable Integer id) {
-		ProdutoGetDTO produtoDto = produtoService.findProdutoById(id);
+	public ResponseEntity<ProdutoGetDTO> findProdutoByIdDTO(@PathVariable Integer id) {
+		ProdutoGetDTO produtoDto = produtoService.findProdutoByIdDTO(id);
 		if (produtoDto == null) {
 			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
 		}
@@ -108,9 +108,7 @@ public class ProdutoController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteProdutoById(@PathVariable Integer id) {
-
-		ProdutoGetDTO produtoDto = produtoService.findProdutoById(id);
-		if (produtoDto == null) {
+		if (produtoService.findProdutoByIdDTO(id) == null) {
 			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
 		}
 		produtoService.deleteProdutoById(id);

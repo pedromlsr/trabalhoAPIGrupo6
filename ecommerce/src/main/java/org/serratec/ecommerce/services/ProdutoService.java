@@ -33,7 +33,12 @@ public class ProdutoService {
 		return listProdutoDto;
 	}
 
-	public ProdutoGetDTO findProdutoById(Integer id) {
+	public Produto findProdutoById(Integer id) {
+		return produtoRepository.findById(id).isPresent() ? produtoRepository.findById(id).get()
+				: null;
+	}
+
+	public ProdutoGetDTO findProdutoByIdDTO(Integer id) {
 		return produtoRepository.findById(id).isPresent() ? convertEntityToDto(produtoRepository.findById(id).get())
 				: null;
 	}
@@ -100,7 +105,7 @@ public class ProdutoService {
 		}
 		
 		Produto produtoAtualizado = new Produto();
-		produtoBD = findProdutoById(id);
+		produtoBD = findProdutoByIdDTO(id);
 
 		produtoAtualizado.setIdProduto(id);
 		produtoAtualizado.setNomeProduto(produtoDto.getNomeProduto());
