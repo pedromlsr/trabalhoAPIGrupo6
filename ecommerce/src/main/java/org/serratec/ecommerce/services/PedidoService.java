@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
-import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.serratec.ecommerce.repositories.ItemPedidoRepository;
@@ -32,6 +31,9 @@ public class PedidoService {
 	@Autowired
 	ItemPedidoService itemPedidoService;
 	
+	@Autowired
+	EmailService emailService;
+	
 	public List<PedidoResDTO> findAllPedido() {
 		if (pedidoRepository.findAll().isEmpty()) {
 			return null;
@@ -53,7 +55,7 @@ public class PedidoService {
 		return pedidoRepository.existsById(id) ? convertEntityToDTO(pedidoRepository.findById(id).get()) : null;
 	}
 
-	public PedidoReqDTO savePedido(PedidoReqDTO pedidoReqDTO) {
+	public PedidoResDTO savePedido(PedidoReqDTO pedidoReqDTO) {
 		Pedido pedido = new Pedido();
 
 		pedido.setDataPedido(LocalDate.now());
@@ -65,7 +67,13 @@ public class PedidoService {
 		
 		PedidoReqDTO novoPedidoReqDTO = itemPedidoService.salvarItemPedido(pedidoReqDTO);
 		
-		return novoPedidoReqDTO;
+		emailService.enviarEmailTexto(novoPedidoReqDTO);
+		
+		PedidoResDTO pedidoResDTO = convertEntityToDTO(pedido);
+		
+		pedidoResDTO.setValorLiqTotal(novoPedidoReqDTO.getValorLiqTotal());
+		
+		return pedidoResDTO;
 	}
 
 	public PedidoResDTO updatePedido(Integer idPedido, Integer idStatus) {

@@ -22,7 +22,7 @@ public class PedidoResDTO {
 
 	private String nomeCliente;
 
-	private Double valorTotalLiquido;
+	private Double valorLiqTotal;
 
 	public Integer getIdPedido() {
 		return idPedido;
@@ -80,12 +80,12 @@ public class PedidoResDTO {
 		this.nomeCliente = nomeCliente;
 	}
 
-	public Double getValorTotalLiquido() {
-		return valorTotalLiquido;
+	public Double getValorLiqTotal() {
+		return valorLiqTotal;
 	}
 
-	public void setValorTotalLiquido(Double valorTotalLiquido) {
-		this.valorTotalLiquido = valorTotalLiquido;
+	public void setValorLiqTotal(Double valorLiqTotal) {
+		this.valorLiqTotal = valorLiqTotal;
 	}
 
 }

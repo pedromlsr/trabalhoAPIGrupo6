@@ -2,8 +2,8 @@ package org.serratec.ecommerce.services;
 
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
-import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ItemPedidoRepository;
+import org.serratec.ecommerce.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +14,14 @@ public class ItemPedidoService {
 
 	@Autowired
 	ProdutoService produtoService;
+	
+	@Autowired
+	PedidoRepository pedidoRepository;
 
 	public PedidoReqDTO salvarItemPedido(PedidoReqDTO pedidoReqDTO) {
 
 		for (ItemPedido itemPedido : pedidoReqDTO.getItemPedidoList()) {
-			itemPedido.getPedido().setIdPedido(pedidoReqDTO.getIdPedido());
+			itemPedido.setPedido(pedidoRepository.findById(pedidoReqDTO.getIdPedido()).get());
 			itemPedido.setProduto(produtoService.findProdutoById(itemPedido.getProduto().getIdProduto()));
 
 			itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
