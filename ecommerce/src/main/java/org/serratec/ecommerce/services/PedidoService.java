@@ -73,7 +73,19 @@ public class PedidoService {
 		return pedidoResDTO;
 	}
 
-	public PedidoResDTO updatePedido(Integer idPedido, Integer idStatus) {
+	public PedidoResDTO updatePedido(PedidoReqDTO pedidoReqDTO) {
+
+		PedidoReqDTO novoPedidoReqDTO = itemPedidoService.salvarItemPedido(pedidoReqDTO);
+
+		PedidoResDTO pedidoResDTO = convertEntityToDTO(pedidoRepository.findById(pedidoReqDTO.getIdPedido()).get());
+
+		pedidoResDTO.setValorLiqTotal(novoPedidoReqDTO.getValorLiqTotal());
+
+		return pedidoResDTO;
+
+	}
+
+	public PedidoResDTO updatePedidoStatus(Integer idPedido, Integer idStatus) {
 		Pedido pedido = pedidoRepository.findById(idPedido).get();
 
 		pedido.setStatus(statusRepository.findById(idStatus).get());

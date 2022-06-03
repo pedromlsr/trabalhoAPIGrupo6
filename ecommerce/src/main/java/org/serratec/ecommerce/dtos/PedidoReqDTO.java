@@ -5,6 +5,7 @@ import java.util.List;
 import org.serratec.ecommerce.entities.ItemPedido;
 
 public class PedidoReqDTO {
+	
 	private Integer idPedido;
 
 	private Integer idCliente;

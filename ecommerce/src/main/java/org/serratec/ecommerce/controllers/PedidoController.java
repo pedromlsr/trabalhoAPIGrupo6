@@ -48,8 +48,8 @@ public class PedidoController {
 	}
 	
 	@PutMapping("/{idPedido}/{idStatus}")
-	public ResponseEntity<PedidoResDTO> updatePedido(@PathVariable Integer idPedido, @PathVariable Integer idStatus) {
-		if (pedidoService.findPedidoById(idPedido) == null) {
+	public ResponseEntity<PedidoResDTO> updatePedidoStatus(@PathVariable Integer idPedido, @PathVariable Integer idStatus) {
+		if (pedidoService.findPedidoByIdDTO(idPedido) == null) {
 			throw new NoSuchElementFoundException(
 					"Não foi possível atualizar. O Pedido de id = " + idPedido + " não foi encontrado.");
 		}
@@ -57,17 +57,17 @@ public class PedidoController {
 			// Criar exception customizada
 			throw new NoSuchElementFoundException("Esta requisição só pode ser efetuada para os status de id 2 e 3 (Enviado e Entregue).");
 		}
-		if (idStatus == 3 && (pedidoService.findPedidoById(idPedido).getDataEnvio() == null)) {
+		if (idStatus == 3 && (pedidoService.findPedidoByIdDTO(idPedido).getDataEnvio() == null)) {
 			// Criar exception customizada
 			throw new NoSuchElementFoundException("Não é possível definir como entregue um pedido que ainda não foi enviado.");
 		}
 
-		return new ResponseEntity<>(pedidoService.updatePedido(idPedido, idStatus), HttpStatus.OK);
+		return new ResponseEntity<>(pedidoService.updatePedidoStatus(idPedido, idStatus), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deletePedidoById(@PathVariable Integer id) {
-		if (pedidoService.findPedidoById(id) == null) {
+		if (pedidoService.findPedidoByIdDTO(id) == null) {
 			throw new NoSuchElementFoundException(
 					"Não foi possível excluir. O Pedido de id = " + id + " não foi encontrado.");
 		}
