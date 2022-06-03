@@ -58,18 +58,18 @@ public class EnderecoController {
 		return new ResponseEntity<>(enderecoService.saveEndereco(endereco), HttpStatus.CREATED);
 	}
 
-	@PostMapping("/endereco-completo")
-	public ResponseEntity<Endereco> salvarEnderecoViaCep(@RequestParam Integer idCliente, @RequestParam String cep,
-			@RequestParam String numero, @RequestParam String complemento) {
-		Cliente cliente = clienteService.findClienteById(idCliente);
-
-		if (cliente == null) {
-			throw new NoSuchElementFoundException("Não foi possível encontrar o cliente com o id " + idCliente);
-		} else {
-			Endereco endereco = enderecoService.saveEnderecoDTO(cep, numero, complemento);
-			return new ResponseEntity<>(endereco, HttpStatus.CREATED);
-		}
-	}
+//	@PostMapping("/endereco-completo")
+//	public ResponseEntity<Endereco> salvarEnderecoViaCep(@RequestParam Integer idCliente, @RequestParam String cep,
+//			@RequestParam String numero, @RequestParam String complemento) {
+//		Cliente cliente = clienteService.findClienteById(idCliente);
+//
+//		if (cliente == null) {
+//			throw new NoSuchElementFoundException("Não foi possível encontrar o cliente com o id " + idCliente);
+//		} else {
+//			Endereco endereco = enderecoService.saveEnderecoDTO(cep, numero, complemento);
+//			return new ResponseEntity<>(endereco, HttpStatus.CREATED);
+//		}
+//	}
 
 	@PutMapping
 	public ResponseEntity<Endereco> updateEndereco(@RequestBody Endereco endereco) {

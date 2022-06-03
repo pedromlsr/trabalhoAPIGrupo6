@@ -1,5 +1,9 @@
 package org.serratec.ecommerce.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.serratec.ecommerce.dtos.ItemPedidoDTO;
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.repositories.ItemPedidoRepository;
@@ -14,9 +18,23 @@ public class ItemPedidoService {
 
 	@Autowired
 	ProdutoService produtoService;
-	
+
 	@Autowired
 	PedidoRepository pedidoRepository;
+
+	public List<ItemPedido> findAllItemPedido() {
+		return itemPedidoRepository.findAll();
+	}
+
+	public List<ItemPedidoDTO> findAllItemPedidoDTO() {
+		List<ItemPedidoDTO> listItemPedidoDTO = new ArrayList<>();
+		for (ItemPedido itemPedido : itemPedidoRepository.findAll()) {
+			
+			listItemPedidoDTO.add(convertEntityToDto(itemPedido));
+		}
+
+		return listItemPedidoDTO;
+	}
 
 	public PedidoReqDTO salvarItemPedido(PedidoReqDTO pedidoReqDTO) {
 
@@ -25,7 +43,8 @@ public class ItemPedidoService {
 			itemPedido.setProduto(produtoService.findProdutoById(itemPedido.getProduto().getIdProduto()));
 
 			itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
-			itemPedido.setValorLiquido(itemPedido.getValorBruto() - (itemPedido.getValorBruto() * itemPedido.getPercentualDesconto()));
+			itemPedido.setValorLiquido(
+					itemPedido.getValorBruto() - (itemPedido.getValorBruto() * itemPedido.getPercentualDesconto()));
 
 			pedidoReqDTO.setValorLiqTotal(pedidoReqDTO.getValorLiqTotal() + itemPedido.getValorLiquido());
 
@@ -35,10 +54,29 @@ public class ItemPedidoService {
 
 		return pedidoReqDTO;
 	}
+	
+	public void deleteItemPedidoById(Integer idItemPedido) {
+		itemPedidoRepository.deleteById(idItemPedido);
+	}
 
-//	public List<ItemPedido> findAllItemPedido() {
-//		return itemPedidoRepository.findAll();
-//	}
+	public ItemPedidoDTO convertEntityToDto(ItemPedido itemPedido) {
+		ItemPedidoDTO itemPedidoDTO = new ItemPedidoDTO();
+
+		itemPedidoDTO.setIdItemPedido(itemPedido.getIdItemPedido());
+		// Verificar possibilidade de NullPointer
+		itemPedidoDTO.setIdPedido(itemPedido.getPedido().getIdPedido());
+		itemPedidoDTO.setIdProduto(itemPedido.getProduto().getIdProduto());
+		itemPedidoDTO.setNomeProduto(itemPedido.getProduto().getNomeProduto());
+		itemPedidoDTO.setPercentualDesconto(itemPedido.getPercentualDesconto());
+		itemPedidoDTO.setPrecoVenda(itemPedido.getPrecoVenda());
+		itemPedidoDTO.setQuantidade(itemPedido.getQuantidade());
+		itemPedidoDTO.setValorBruto(itemPedido.getValorBruto());
+		itemPedidoDTO.setValorLiquido(itemPedido.getValorLiquido());
+
+		return itemPedidoDTO;
+	}
+
+	
 //
 //	public ItemPedido findItemPedidoById(Integer idItemPedido) {
 //		return itemPedidoRepository.findById(idItemPedido).isPresent()
@@ -54,7 +92,5 @@ public class ItemPedidoService {
 //		return itemPedidoRepository.save(itemPedido);
 //	}
 //
-//	public void deleteItemPedidoById(Integer idItemPedido) {
-//		itemPedidoRepository.deleteById(idItemPedido);
-//	}
+	
 }

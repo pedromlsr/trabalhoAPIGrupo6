@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
+import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.repositories.ClienteRepository;
-import org.serratec.ecommerce.repositories.ItemPedidoRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
 import org.serratec.ecommerce.repositories.StatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,11 @@ public class PedidoService {
 	StatusRepository statusRepository;
 
 	@Autowired
-	ItemPedidoRepository itemPedidoRepository;
-	
-	@Autowired
 	ItemPedidoService itemPedidoService;
-	
+
 	@Autowired
 	EmailService emailService;
-	
+
 	public List<PedidoResDTO> findAllPedido() {
 		if (pedidoRepository.findAll().isEmpty()) {
 			return null;
@@ -61,18 +58,18 @@ public class PedidoService {
 		pedido.setDataPedido(LocalDate.now());
 		pedido.setStatus(statusRepository.findById(1).get());
 		pedido.setCliente(clienteRepository.findById(pedidoReqDTO.getIdCliente()).get());
-		
+
 		Pedido pedidoSave = pedidoRepository.save(pedido);
 		pedidoReqDTO.setIdPedido(pedidoSave.getIdPedido());
-		
+
 		PedidoReqDTO novoPedidoReqDTO = itemPedidoService.salvarItemPedido(pedidoReqDTO);
-		
+
 		emailService.enviarEmailTexto(novoPedidoReqDTO);
-		
+
 		PedidoResDTO pedidoResDTO = convertEntityToDTO(pedido);
-		
+
 		pedidoResDTO.setValorLiqTotal(novoPedidoReqDTO.getValorLiqTotal());
-		
+
 		return pedidoResDTO;
 	}
 
@@ -97,7 +94,15 @@ public class PedidoService {
 	}
 
 	public void deletePedidoById(Integer id) {
+
+		for (ItemPedido itemPedido : itemPedidoService.findAllItemPedido()) {
+
+			if (itemPedido.getPedido().getIdPedido() == id) {
+				itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
+			}
+		}
 		pedidoRepository.deleteById(id);
+
 	}
 
 //	private Pedido convertDTOToEntity(PedidoReqDTO pedidoReqDTO) {
