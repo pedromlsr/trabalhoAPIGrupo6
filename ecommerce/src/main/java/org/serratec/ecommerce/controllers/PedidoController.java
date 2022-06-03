@@ -47,6 +47,16 @@ public class PedidoController {
 		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
 	}
 	
+	@PutMapping
+	public ResponseEntity<PedidoResDTO> updatePedido( @RequestBody PedidoReqDTO pedidoReqDTO) {
+		if (pedidoService.findPedidoByIdDTO(pedidoReqDTO.getIdPedido()) == null) {
+			throw new NoSuchElementFoundException(
+					"Não foi possível atualizar. O Pedido de id = " + pedidoReqDTO.getIdPedido() + " não foi encontrado.");
+		}		
+		
+		return new ResponseEntity<>(pedidoService.updatePedido(pedidoReqDTO), HttpStatus.OK);
+	}
+	
 	@PutMapping("/{idPedido}/{idStatus}")
 	public ResponseEntity<PedidoResDTO> updatePedidoStatus(@PathVariable Integer idPedido, @PathVariable Integer idStatus) {
 		if (pedidoService.findPedidoByIdDTO(idPedido) == null) {

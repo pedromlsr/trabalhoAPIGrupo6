@@ -93,6 +93,14 @@ public class Pedido {
 		return cliente;
 	}
 
+	public List<ItemPedido> getItemPedidoList() {
+		return itemPedidoList;
+	}
+
+	public void setItemPedidoList(List<ItemPedido> itemPedidoList) {
+		this.itemPedidoList = itemPedidoList;
+	}
+
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}

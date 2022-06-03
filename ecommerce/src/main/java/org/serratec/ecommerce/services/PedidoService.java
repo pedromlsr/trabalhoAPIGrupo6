@@ -38,7 +38,19 @@ public class PedidoService {
 			List<PedidoResDTO> pedidoResDTOList = new ArrayList<>();
 
 			for (Pedido pedido : pedidoRepository.findAll()) {
-				pedidoResDTOList.add(convertEntityToDTO(pedido));
+				Double valorLiqTotal = 0.0;
+				for (ItemPedido itemPedido : itemPedidoService.findAllItemPedido()) {
+					if (pedido.getIdPedido() == itemPedido.getPedido().getIdPedido()) {
+						if (itemPedido.getValorLiquido() != null) {
+							valorLiqTotal += itemPedido.getValorLiquido();
+						}
+					}
+				}
+
+				PedidoResDTO pedidoResDTO = convertEntityToDTO(pedido);
+				pedidoResDTO.setValorLiqTotal(valorLiqTotal);
+
+				pedidoResDTOList.add(pedidoResDTO);
 			}
 			return pedidoResDTOList;
 		}
@@ -74,6 +86,18 @@ public class PedidoService {
 	}
 
 	public PedidoResDTO updatePedido(PedidoReqDTO pedidoReqDTO) {
+
+		Integer indice = 0;
+
+		Pedido pedidoBD = findPedidoById(pedidoReqDTO.getIdPedido());
+
+		while (indice < pedidoReqDTO.getItemPedidoList().size()) {
+
+			pedidoReqDTO.getItemPedidoList().get(indice)
+					.setIdItemPedido(pedidoBD.getItemPedidoList().get(indice).getIdItemPedido());
+
+			indice++;
+		}
 
 		PedidoReqDTO novoPedidoReqDTO = itemPedidoService.salvarItemPedido(pedidoReqDTO);
 

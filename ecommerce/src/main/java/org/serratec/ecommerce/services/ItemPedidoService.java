@@ -29,7 +29,7 @@ public class ItemPedidoService {
 	public List<ItemPedidoDTO> findAllItemPedidoDTO() {
 		List<ItemPedidoDTO> listItemPedidoDTO = new ArrayList<>();
 		for (ItemPedido itemPedido : itemPedidoRepository.findAll()) {
-			
+
 			listItemPedidoDTO.add(convertEntityToDto(itemPedido));
 		}
 
@@ -39,22 +39,22 @@ public class ItemPedidoService {
 	public PedidoReqDTO salvarItemPedido(PedidoReqDTO pedidoReqDTO) {
 
 		for (ItemPedido itemPedido : pedidoReqDTO.getItemPedidoList()) {
+			
 			itemPedido.setPedido(pedidoRepository.findById(pedidoReqDTO.getIdPedido()).get());
 			itemPedido.setProduto(produtoService.findProdutoById(itemPedido.getProduto().getIdProduto()));
-
+			
 			itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
 			itemPedido.setValorLiquido(
 					itemPedido.getValorBruto() - (itemPedido.getValorBruto() * itemPedido.getPercentualDesconto()));
-
+			
 			pedidoReqDTO.setValorLiqTotal(pedidoReqDTO.getValorLiqTotal() + itemPedido.getValorLiquido());
-
+						
 			itemPedidoRepository.save(itemPedido);
-
+			
 		}
-
 		return pedidoReqDTO;
 	}
-	
+
 	public void deleteItemPedidoById(Integer idItemPedido) {
 		itemPedidoRepository.deleteById(idItemPedido);
 	}
@@ -76,7 +76,6 @@ public class ItemPedidoService {
 		return itemPedidoDTO;
 	}
 
-	
 //
 //	public ItemPedido findItemPedidoById(Integer idItemPedido) {
 //		return itemPedidoRepository.findById(idItemPedido).isPresent()
@@ -92,5 +91,5 @@ public class ItemPedidoService {
 //		return itemPedidoRepository.save(itemPedido);
 //	}
 //
-	
+
 }
