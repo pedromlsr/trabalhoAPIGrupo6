@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
@@ -40,7 +41,11 @@ public class Endereco {
 	@Column(name = "complemento")
 	private String complemento;
 
+	@Column(name = "uf")
+	private String uf;
+
 	@OneToMany(mappedBy = "endereco")
+	@JsonIgnore
 	private List<Cliente> clienteList;
 
 	public Integer getIdEndereco() {
@@ -105,6 +110,14 @@ public class Endereco {
 
 	public void setClienteList(List<Cliente> clienteList) {
 		this.clienteList = clienteList;
+	}
+
+	public String getUf() {
+		return uf;
+	}
+
+	public void setUf(String uf) {
+		this.uf = uf;
 	}
 
 }
