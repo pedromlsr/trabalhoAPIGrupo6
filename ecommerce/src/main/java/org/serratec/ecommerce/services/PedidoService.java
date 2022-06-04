@@ -1,16 +1,9 @@
 package org.serratec.ecommerce.services;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.serratec.ecommerce.dtos.PedidoReqDTO;
-import org.serratec.ecommerce.dtos.PedidoResDTO;
-import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
-import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
-import org.serratec.ecommerce.repositories.StatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,44 +12,12 @@ public class PedidoService {
 	@Autowired
 	PedidoRepository pedidoRepository;
 
-	@Autowired
-	ClienteRepository clienteRepository;
-
-	@Autowired
-	StatusRepository statusRepository;
-
-	@Autowired
-	ItemPedidoService itemPedidoService;
-
-	@Autowired
-	EmailService emailService;
-
-	public List<PedidoResDTO> findAllPedido() {
-		if (pedidoRepository.findAll().isEmpty()) {
-			return null;
-		} else {
-			List<PedidoResDTO> pedidoResDTOList = new ArrayList<>();
-
-			for (Pedido pedido : pedidoRepository.findAll()) {
-				Double valorLiqTotal = 0.0;
-				for (ItemPedido itemPedido : itemPedidoService.findAllItemPedido()) {
-					if (pedido.getIdPedido() == itemPedido.getPedido().getIdPedido()) {
-						if (itemPedido.getValorLiquido() != null) {
-							valorLiqTotal += itemPedido.getValorLiquido();
-						}
-					}
-				}
-
-				PedidoResDTO pedidoResDTO = convertEntityToDTO(pedido);
-				pedidoResDTO.setValorLiqTotal(valorLiqTotal);
-
-				pedidoResDTOList.add(pedidoResDTO);
-			}
-			return pedidoResDTOList;
-		}
+	public List<Pedido> findAllPedido() {
+		return pedidoRepository.findAll();
 	}
 
 	public Pedido findPedidoById(Integer id) {
+
 		return pedidoRepository.existsById(id) ? pedidoRepository.findById(id).get() : null;
 	}
 	
@@ -132,37 +93,18 @@ public class PedidoService {
 
 	}
 
-	public PedidoResDTO updatePedidoStatus(Integer idPedido, Integer idStatus) {
-		Pedido pedido = pedidoRepository.findById(idPedido).get();
-
-		pedido.setStatus(statusRepository.findById(idStatus).get());
-
-		if (idStatus == 2) {
-			pedido.setDataEnvio(LocalDate.now());
-		}
-
-		if (idStatus == 3) {
-			pedido.setDataEntrega(LocalDate.now());
-		}
-
-		return convertEntityToDTO(pedidoRepository.save(pedido));
+	public Pedido savePedido(Pedido pedido) {
+		return pedidoRepository.save(pedido);
 	}
 
-	public Pedido atualizarEnvioPedido(Pedido pedido) {
+	public Pedido updatePedido(Pedido pedido) {
 		return pedidoRepository.save(pedido);
 	}
 
 	public void deletePedidoById(Integer id) {
-
-		for (ItemPedido itemPedido : itemPedidoService.findAllItemPedido()) {
-
-			if (itemPedido.getPedido().getIdPedido() == id) {
-				itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
-			}
-		}
 		pedidoRepository.deleteById(id);
-
 	}
+
 
 //	private Pedido convertDTOToEntity(PedidoReqDTO pedidoReqDTO) {
 //	

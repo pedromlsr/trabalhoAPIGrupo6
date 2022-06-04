@@ -22,8 +22,6 @@ public class PedidoResDTO {
 
 	private String nomeCliente;
 
-	private Double valorLiqTotal;
-
 	public Integer getIdPedido() {
 		return idPedido;
 	}
@@ -78,14 +76,6 @@ public class PedidoResDTO {
 
 	public void setNomeCliente(String nomeCliente) {
 		this.nomeCliente = nomeCliente;
-	}
-
-	public Double getValorLiqTotal() {
-		return valorLiqTotal;
-	}
-
-	public void setValorLiqTotal(Double valorLiqTotal) {
-		this.valorLiqTotal = valorLiqTotal;
 	}
 
 }

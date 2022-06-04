@@ -1,25 +1,15 @@
 package org.serratec.ecommerce.entities;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.sql.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "pedido")
-@JsonIdentityInfo(scope = Pedido.class, generator = ObjectIdGenerators.PropertyGenerator.class, property = "idPedido")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idPedido")
 public class Pedido {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,27 +17,20 @@ public class Pedido {
 	private Integer idPedido;
 
 	@Column(name = "data_pedido")
-	@JsonFormat(pattern = "dd/MM/yyyy")
-	private LocalDate dataPedido;
+	private Date dataPedido;
 
 	@Column(name = "data_entrega")
-	@JsonFormat(pattern = "dd/MM/yyyy")
-	private LocalDate dataEntrega;
+	private Date dataEntrega;
 
 	@Column(name = "data_envio")
-	@JsonFormat(pattern = "dd/MM/yyyy")
-	private LocalDate dataEnvio;
+	private Date dataEnvio;
 
-	@ManyToOne
-	@JoinColumn(name = "id_status", referencedColumnName = "id_status")
-	private Status status;
+	@Column(name = "status")
+	private Boolean status;
 
 	@ManyToOne
 	@JoinColumn(name = "id_cliente", referencedColumnName = "id_cliente")
 	private Cliente cliente;
-
-	@OneToMany(mappedBy = "pedido")
-	private List<ItemPedido> itemPedidoList;
 
 	public Integer getIdPedido() {
 		return idPedido;
@@ -57,35 +40,35 @@ public class Pedido {
 		this.idPedido = idPedido;
 	}
 
-	public LocalDate getDataPedido() {
+	public Date getDataPedido() {
 		return dataPedido;
 	}
 
-	public void setDataPedido(LocalDate dataPedido) {
+	public void setDataPedido(Date dataPedido) {
 		this.dataPedido = dataPedido;
 	}
 
-	public LocalDate getDataEntrega() {
+	public Date getDataEntrega() {
 		return dataEntrega;
 	}
 
-	public void setDataEntrega(LocalDate dataEntrega) {
+	public void setDataEntrega(Date dataEntrega) {
 		this.dataEntrega = dataEntrega;
 	}
 
-	public LocalDate getDataEnvio() {
+	public Date getDataEnvio() {
 		return dataEnvio;
 	}
 
-	public void setDataEnvio(LocalDate dataEnvio) {
+	public void setDataEnvio(Date dataEnvio) {
 		this.dataEnvio = dataEnvio;
 	}
 
-	public Status getStatus() {
+	public Boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(Status status) {
+	public void setStatus(Boolean status) {
 		this.status = status;
 	}
 
@@ -93,16 +76,7 @@ public class Pedido {
 		return cliente;
 	}
 
-	public List<ItemPedido> getItemPedidoList() {
-		return itemPedidoList;
-	}
-
-	public void setItemPedidoList(List<ItemPedido> itemPedidoList) {
-		this.itemPedidoList = itemPedidoList;
-	}
-
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-
 }
