@@ -59,10 +59,26 @@ public class PedidoService {
 	public Pedido findPedidoById(Integer id) {
 		return pedidoRepository.existsById(id) ? pedidoRepository.findById(id).get() : null;
 	}
-
+	
 	public PedidoResDTO findPedidoByIdDTO(Integer id) {
-		return pedidoRepository.existsById(id) ? convertEntityToDTO(pedidoRepository.findById(id).get()) : null;
+		
+		if(!pedidoRepository.existsById(id)) {
+			return null;
+		}		
+		Pedido pedido = pedidoRepository.findById(id).get();
+		Double valorLiqTotal = 0.0;
+		for (ItemPedido itemPedido : pedido.getItemPedidoList()) {
+			if (pedido.getIdPedido() == itemPedido.getPedido().getIdPedido()) {
+				if (itemPedido.getValorLiquido() != null) {
+					valorLiqTotal += itemPedido.getValorLiquido();
+				}
+			}
+		}
+		PedidoResDTO pedidoResDTO = convertEntityToDTO(pedido);
+		pedidoResDTO.setValorLiqTotal(valorLiqTotal);
+		return pedidoResDTO;
 	}
+
 
 	public PedidoResDTO savePedido(PedidoReqDTO pedidoReqDTO) {
 		Pedido pedido = new Pedido();
@@ -149,7 +165,7 @@ public class PedidoService {
 	}
 
 //	private Pedido convertDTOToEntity(PedidoReqDTO pedidoReqDTO) {
-//
+//	
 //	}
 
 	private PedidoResDTO convertEntityToDTO(Pedido pedido) {
