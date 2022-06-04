@@ -6,6 +6,7 @@ import java.util.List;
 import org.serratec.ecommerce.dtos.ItemPedidoDTO;
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
+import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ItemPedidoRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +40,25 @@ public class ItemPedidoService {
 	public PedidoReqDTO salvarItemPedido(PedidoReqDTO pedidoReqDTO) {
 
 		for (ItemPedido itemPedido : pedidoReqDTO.getItemPedidoList()) {
+
+			Integer idProdutoItemPedido = itemPedido.getProduto().getIdProduto();
 			
 			itemPedido.setPedido(pedidoRepository.findById(pedidoReqDTO.getIdPedido()).get());
+
+			if (produtoService.findProdutoById(idProdutoItemPedido) == null) {
+				throw new NoSuchElementFoundException("Não foi encontrado um produto com o Id: " + idProdutoItemPedido);
+			}
+
 			itemPedido.setProduto(produtoService.findProdutoById(itemPedido.getProduto().getIdProduto()));
-			
+
 			itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
 			itemPedido.setValorLiquido(
 					itemPedido.getValorBruto() - (itemPedido.getValorBruto() * itemPedido.getPercentualDesconto()));
-			
+
 			pedidoReqDTO.setValorLiqTotal(pedidoReqDTO.getValorLiqTotal() + itemPedido.getValorLiquido());
-						
+
 			itemPedidoRepository.save(itemPedido);
-			
+
 		}
 		return pedidoReqDTO;
 	}
@@ -63,7 +71,6 @@ public class ItemPedidoService {
 		ItemPedidoDTO itemPedidoDTO = new ItemPedidoDTO();
 
 		itemPedidoDTO.setIdItemPedido(itemPedido.getIdItemPedido());
-		// Verificar possibilidade de NullPointer
 		itemPedidoDTO.setIdPedido(itemPedido.getPedido().getIdPedido());
 		itemPedidoDTO.setIdProduto(itemPedido.getProduto().getIdProduto());
 		itemPedidoDTO.setNomeProduto(itemPedido.getProduto().getNomeProduto());

@@ -91,7 +91,7 @@ public class PedidoService {
 
 		if (pedidoReqDTO.getItemPedidoList().size() >= pedidoBD.getItemPedidoList().size()) {
 
-			for (int i = 0; i < pedidoReqDTO.getItemPedidoList().size(); i++) {
+			for (int i = 0; i < pedidoBD.getItemPedidoList().size(); i++) {
 
 				pedidoReqDTO.getItemPedidoList().get(i)
 						.setIdItemPedido(pedidoBD.getItemPedidoList().get(i).getIdItemPedido());
@@ -99,30 +99,9 @@ public class PedidoService {
 			}
 
 		} else {
-
-			Integer indice = pedidoBD.getItemPedidoList().size() - pedidoReqDTO.getItemPedidoList().size();
-
-			for (int i = 0; i < indice; i++) {
-
-				itemPedidoService.deleteItemPedidoById(pedidoBD.getItemPedidoList().get(i).getIdItemPedido());
-			}
-
-			List<ItemPedido> itemPedidoListNova = new ArrayList<>();
-
+			
 			for (ItemPedido itemPedido : pedidoBD.getItemPedidoList()) {
-				itemPedidoListNova.add(itemPedido);
-			}
-
-			pedidoBD.setItemPedidoList(itemPedidoListNova);
-
-			Integer indice2 = 0;
-
-			for (ItemPedido itemPedido : pedidoBD.getItemPedidoList()) {
-
-				pedidoReqDTO.getItemPedidoList().get(indice2).setIdItemPedido(itemPedido.getIdItemPedido());
-
-				indice2++;
-
+				itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
 			}
 
 		}
