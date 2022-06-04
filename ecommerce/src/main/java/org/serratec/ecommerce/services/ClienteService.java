@@ -63,16 +63,21 @@ public class ClienteService {
 	}
 
 	public ClienteDTO updateCliente(ClienteDTO clienteDTO) throws CpfException, EmailException, ClienteException {
-
+		if (clienteRepository.existsByCpf(clienteDTO.getCpf())) {
+			throw new CpfException("Cpf já cadastrado.");
+		}
+		if (clienteRepository.existsByEmail(clienteDTO.getEmail())) {
+			throw new EmailException("Email já cadastrado.");
+		}
 		if (!validate(clienteDTO.getEmail())) {
 			throw new EmailException("Email inválido.");
-		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
-			throw new ClienteException("Nome com apenas letras.");
-		} else {
-			Cliente cliente = DTOParaEntidade(clienteDTO);
-			cliente = clienteRepository.save(cliente);
-			return EntidadeParaDTO(clienteRepository.save(cliente));
 		}
+		if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
+			throw new ClienteException("Nome com apenas letras.");
+		}
+		Cliente cliente = DTOParaEntidade(clienteDTO);
+		cliente = clienteRepository.save(cliente);
+		return EntidadeParaDTO(clienteRepository.save(cliente));
 
 	}
 
