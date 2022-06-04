@@ -1,6 +1,6 @@
 package org.serratec.ecommerce.entities;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -23,16 +25,26 @@ public class Produto {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_produto")
 	private Integer idProduto;
+
 	@Column(name = "nome")
+	@NotBlank(message = "O nome do produto não pode estar em branco")
 	private String nomeProduto;
+
 	@Column(name = "descricao")
+	@NotBlank(message = "A descrição do produto não pode estar em branco")
 	private String descricaoProduto;
+
 	@Column(name = "qtd_estoque")
+	@NotNull(message = "A quantidade de produto em estoque não pode estar em branco")
 	private Integer qtdEstoque;
+
 	@Column(name = "data_cadastro")
-	private Date dataCadastro;
+	private LocalDate dataCadastro;
+
 	@Column(name = "valor_unitario")
+	@NotNull(message = "O valor do produto não pode estar em branco")
 	private Double valorUnitario;
+
 	@Column(name = "imagem")
 	private String nomeImagemProduto;
 
@@ -72,11 +84,11 @@ public class Produto {
 		this.qtdEstoque = qtdEstoque;
 	}
 
-	public Date getDataCadastro() {
+	public LocalDate getDataCadastro() {
 		return dataCadastro;
 	}
 
-	public void setDataCadastro(Date dataCadastro) {
+	public void setDataCadastro(LocalDate dataCadastro) {
 		this.dataCadastro = dataCadastro;
 	}
 

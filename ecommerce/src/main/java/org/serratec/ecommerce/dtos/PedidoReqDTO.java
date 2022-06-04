@@ -1,11 +1,21 @@
 package org.serratec.ecommerce.dtos;
 
+
+import java.util.List;
+
+import org.serratec.ecommerce.entities.ItemPedido;
+
 public class PedidoReqDTO {
+	
+
 	private Integer idPedido;
 
 	private Integer idCliente;
 
-	private Integer idItemPedido;
+
+	private List<ItemPedido> itemPedidoList;
+
+	private Double valorLiqTotal;
 
 	public Integer getIdPedido() {
 		return idPedido;
@@ -23,12 +33,22 @@ public class PedidoReqDTO {
 		this.idCliente = idCliente;
 	}
 
-	public Integer getIdItemPedido() {
-		return idItemPedido;
+
+	public List<ItemPedido> getItemPedidoList() {
+		return itemPedidoList;
 	}
 
-	public void setIdItemPedido(Integer idItemPedido) {
-		this.idItemPedido = idItemPedido;
+	public void setItemPedidoList(List<ItemPedido> itemPedidoList) {
+		this.itemPedidoList = itemPedidoList;
+	}
+
+	public Double getValorLiqTotal() {
+		return valorLiqTotal;
+	}
+
+	public void setValorLiqTotal(Double valorLiqTotal) {
+		this.valorLiqTotal = valorLiqTotal;
+
 	}
 
 }
