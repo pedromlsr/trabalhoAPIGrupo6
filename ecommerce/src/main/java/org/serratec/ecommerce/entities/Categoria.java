@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -20,9 +21,11 @@ public class Categoria {
 	private Integer idCategoria;
 
 	@Column(name = "nome")
+	@NotBlank(message="O nome da categoria não pode estar em branco")
 	private String nomeCategoria;
 
 	@Column(name = "descricao")
+	@NotBlank(message="A descrição da categoria não pode estar em branco")
 	private String descricaoCategoria;
 
 	public Integer getIdCategoria() {
