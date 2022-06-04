@@ -2,9 +2,14 @@ package org.serratec.ecommerce.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.serratec.ecommerce.dtos.ClienteDTO;
 import org.serratec.ecommerce.entities.Cliente;
+import org.serratec.ecommerce.exceptions.ClienteException;
+import org.serratec.ecommerce.exceptions.CpfException;
+import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,25 +30,50 @@ public class ClienteService {
 	}
 
 	public ClienteDTO findClienteById(Integer idCliente) {
-		return clienteRepository.findById(idCliente).isPresent() ?
-			EntidadeParaDTO(clienteRepository.findById(idCliente).get()) : null;
+		return clienteRepository.findById(idCliente).isPresent()
+				? EntidadeParaDTO(clienteRepository.findById(idCliente).get())
+				: null;
 	}
 
 	public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
-		if (clienteRepository.existsByCpf(clienteDTO.getCpf()) == true) {
-			clienteDTO.setCpf(null);
-			return clienteDTO;
+		Boolean cpfExistente = clienteRepository.existsByCpf(clienteDTO.getCpf());
+		Boolean emailExistente = clienteRepository.existsByEmail(clienteDTO.getEmail());
+
+		if (cpfExistente == true) {
+			throw new CpfException("CPF já registrado.");
+		} else if (emailExistente == true) {
+			throw new EmailException("Email já registrado.");
+		} else if (!validate(clienteDTO.getEmail())) {
+			throw new EmailException("Email inválido.");
+		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
+			throw new ClienteException("Nome com apenas letras.");
+		} else {
+			Cliente cliente = DTOParaEntidade(clienteDTO);
+			cliente = clienteRepository.save(cliente);
+			return EntidadeParaDTO(cliente);
 		}
-		if (clienteRepository.existsByEmail(clienteDTO.getEmail()) == true) {
-			clienteDTO.setEmail(null);
-			return clienteDTO;
-		}
-		return EntidadeParaDTO(clienteRepository.save(DTOParaEntidade(clienteDTO)));
 	}
 
-	public ClienteDTO updateCliente(ClienteDTO clienteDTO) {
-		Cliente cliente = DTOParaEntidade(clienteDTO);
-		return EntidadeParaDTO(clienteRepository.save(cliente));
+	public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+			Pattern.CASE_INSENSITIVE);
+
+	public static boolean validate(String stringEmail) {
+		Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(stringEmail);
+		return matcher.find();
+	}
+
+	public ClienteDTO updateCliente(ClienteDTO clienteDTO) throws CpfException, EmailException, ClienteException {
+
+		if (!validate(clienteDTO.getEmail())) {
+			throw new EmailException("Email inválido.");
+		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
+			throw new ClienteException("Nome com apenas letras.");
+		} else {
+			Cliente cliente = DTOParaEntidade(clienteDTO);
+			cliente = clienteRepository.save(cliente);
+			return EntidadeParaDTO(clienteRepository.save(cliente));
+		}
+
 	}
 
 	public void deleteClienteById(Integer idCliente) {

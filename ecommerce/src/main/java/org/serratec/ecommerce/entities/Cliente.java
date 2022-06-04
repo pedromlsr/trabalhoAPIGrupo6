@@ -10,12 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-
-import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -26,30 +20,21 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 public class Cliente {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@NotBlank(message = "Campo não informado.")
 	@Column(name = "id_cliente")
 	private Integer idCliente;
 
-	@NotBlank(message = "Campo não informado.")
-	@Email(message = "Campo inválido.")
 	@Column(name = "email")
 	private String email;
 
-	@NotBlank(message = "Campo não informado.")
 	@Column(name = "nome_completo")
 	private String nomeCompleto;
 
-	@NotBlank(message = "Campo não informado.")
-	@CPF(message = "Campo inválido.")
 	@Column(name = "cpf")
 	private String cpf;
 
-	@NotBlank(message = "Campo não informado.")
 	@Column(name = "telefone")
 	private String telefone;
 
-	@Min(value = 1900, message = "Ano de nascimento deve ser maior que 1900.")
-	@Max(value = 2023, message = "Ano de nascimento deve ser menor que 2023.")
 	@Column(name = "data_nascimento")
 	private Date dataNascimento;
 

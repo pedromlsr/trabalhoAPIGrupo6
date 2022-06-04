@@ -71,4 +71,31 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(CpfException.class)
+	public final ResponseEntity<Object> handleCpfClienteException(CpfException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Esse CPF já foi resgistrado.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(EmailException.class)
+	public final ResponseEntity<Object> handleEmailClienteException(EmailException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no email.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(ClienteException.class)
+	public final ResponseEntity<Object> handleClienteException(ClienteException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do cliente.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+
 }
