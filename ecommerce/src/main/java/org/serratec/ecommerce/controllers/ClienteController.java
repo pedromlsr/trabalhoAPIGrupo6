@@ -5,8 +5,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.serratec.ecommerce.dtos.ClienteDTO;
-import org.serratec.ecommerce.exceptions.CpfException;
-import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,12 +36,6 @@ public class ClienteController {
 
 	@PostMapping
 	public ResponseEntity<ClienteDTO> saveCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
-		if (clienteService.saveCliente(clienteDTO).getCpf() == null) {
-			throw new CpfException("CPF já existente.");
-		}
-		if (clienteService.saveCliente(clienteDTO).getEmail() == null) {
-			throw new EmailException("Email já existente.");
-		}
 		return new ResponseEntity<>(clienteService.saveCliente(clienteDTO), HttpStatus.CREATED);
 	}
 
