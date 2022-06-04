@@ -8,8 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -20,35 +18,27 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 public class ItemPedido {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_item_pedido")
-    private Integer idItemPedido;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_item_pedido")
+	private Integer idItemPedido;
+	@Column(name = "quantidade")
+	private Integer quantidade;
+	@Column(name = "preco_venda")
+	private Double precoVenda;
+	@Column(name = "percentual_desconto")
+	private Double percentualDesconto;
+	@Column(name = "valor_bruto")
+	private Double valorBruto;
+	@Column(name = "valor_liquido")
+	private Double valorLiquido;
 
-    @Column(name = "quantidade")
-    @NotNull(message = "A quantidade não pode estar em branco")
-    @Min(value = 1, message="A quantidade mínima é de 1 unidade")
-    private Integer quantidade;
+	@ManyToOne
+	@JoinColumn(name = "id_pedido", referencedColumnName = "id_pedido")
+	private Pedido pedido;
 
-    @Column(name = "preco_venda")
-    private Double precoVenda;
-
-    @Column(name = "percentual_desconto")
-    @NotNull(message="Insira um percertual de desconto")
-    private Double percentualDesconto;
-
-    @Column(name = "valor_bruto")
-    private Double valorBruto;
-
-    @Column(name = "valor_liquido")
-    private Double valorLiquido;
-
-    @ManyToOne
-    @JoinColumn(name = "id_pedido", referencedColumnName = "id_pedido")
-    private Pedido pedido;
-
-    @ManyToOne
-    @JoinColumn(name = "id_produto", referencedColumnName = "id_produto")
-    private Produto produto;
+	@ManyToOne
+	@JoinColumn(name = "id_produto", referencedColumnName = "id_produto")
+	private Produto produto;
 
 	public Integer getIdItemPedido() {
 		return idItemPedido;

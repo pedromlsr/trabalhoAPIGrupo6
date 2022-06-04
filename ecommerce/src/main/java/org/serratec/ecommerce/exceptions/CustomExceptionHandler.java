@@ -97,5 +97,4 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do cliente.", details);
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
-
 }
