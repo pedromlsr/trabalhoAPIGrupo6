@@ -60,8 +60,7 @@ public class PedidoService {
 		return pedidoRepository.existsById(id) ? pedidoRepository.findById(id).get() : null;
 	}
 	
-	public PedidoResDTO findPedidoByIdDTO(Integer id) {
-		
+	public PedidoResDTO findPedidoByIdDTO(Integer id) {		
 		if(!pedidoRepository.existsById(id)) {
 			return null;
 		}		

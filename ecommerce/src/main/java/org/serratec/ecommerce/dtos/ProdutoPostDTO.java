@@ -1,5 +1,6 @@
 package org.serratec.ecommerce.dtos;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -14,6 +15,7 @@ public class ProdutoPostDTO {
 	private String descricaoProduto;
 	
 	@NotNull(message="A quantidade de produto em estoque não pode estar em branco")
+	@Min(value=0,message="A quantidade no estoque deve ser igual ou maior do que 0")
 	private Integer qtdEstoque;	
 	
 	@NotNull(message="O valor do produto não pode estar em branco")
