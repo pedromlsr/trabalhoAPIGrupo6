@@ -2,9 +2,7 @@ package org.serratec.ecommerce.controllers;
 
 import java.util.List;
 
-import org.serratec.ecommerce.dtos.PedidoReqDTO;
-import org.serratec.ecommerce.dtos.PedidoResDTO;
-import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
+import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.services.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,67 +21,36 @@ import org.springframework.web.bind.annotation.RestController;
 public class PedidoController {
 	@Autowired
 	PedidoService pedidoService;
-
+	
 	@GetMapping
-	public ResponseEntity<List<PedidoResDTO>> findAllPedido() {
-		if (pedidoService.findAllPedido() == null) {
-			throw new NoSuchElementFoundException("Nenhum pedido encontrado.");
-		}
-
-		return new ResponseEntity<>(pedidoService.findAllPedido(), HttpStatus.OK);
+	public ResponseEntity<List<Pedido>> findAllPedido() {
+		List<Pedido> pedidoList = pedidoService.findAllPedido();
+		return new ResponseEntity<>(pedidoList, HttpStatus.OK);
 	}
-
+	
 	@GetMapping("/{id}")
-	public ResponseEntity<PedidoResDTO> findPedidoByIdDTO(@PathVariable Integer id) {
-		if (pedidoService.findPedidoByIdDTO(id) == null) {
-			throw new NoSuchElementFoundException("O Pedido de id = " + id + " não foi encontrado.");
-		}
-
-		return new ResponseEntity<>(pedidoService.findPedidoByIdDTO(id), HttpStatus.OK);
+	public ResponseEntity<Pedido> findPedidoById(@PathVariable Integer id) {
+		Pedido pedido = pedidoService.findPedidoById(id);
+		return new ResponseEntity<>(pedido, HttpStatus.OK);
 	}
-
+	
 	@PostMapping
-	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
-		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
+	public ResponseEntity<Pedido> savePedido(@RequestBody Pedido pedido) {
+		return new ResponseEntity<>(pedidoService.savePedido(pedido), HttpStatus.CREATED);
 	}
-	
-	@PutMapping
-	public ResponseEntity<PedidoResDTO> updatePedido( @RequestBody PedidoReqDTO pedidoReqDTO) {
-		if (pedidoService.findPedidoByIdDTO(pedidoReqDTO.getIdPedido()) == null) {
-			throw new NoSuchElementFoundException(
-					"Não foi possível atualizar. O Pedido de id = " + pedidoReqDTO.getIdPedido() + " não foi encontrado.");
-		}		
-		
-		return new ResponseEntity<>(pedidoService.updatePedido(pedidoReqDTO), HttpStatus.OK);
-	}
-	
-	@PutMapping("/{idPedido}/{idStatus}")
-	public ResponseEntity<PedidoResDTO> updatePedidoStatus(@PathVariable Integer idPedido, @PathVariable Integer idStatus) {
-		if (pedidoService.findPedidoByIdDTO(idPedido) == null) {
-			throw new NoSuchElementFoundException(
-					"Não foi possível atualizar. O Pedido de id = " + idPedido + " não foi encontrado.");
-		}
-		if (idStatus != 2 && idStatus != 3) {
-			// Criar exception customizada
-			throw new NoSuchElementFoundException("Esta requisição só pode ser efetuada para os status de id 2 e 3 (Enviado e Entregue).");
-		}
-		if (idStatus == 3 && (pedidoService.findPedidoByIdDTO(idPedido).getDataEnvio() == null)) {
-			// Criar exception customizada
-			throw new NoSuchElementFoundException("Não é possível definir como entregue um pedido que ainda não foi enviado.");
-		}
 
-		return new ResponseEntity<>(pedidoService.updatePedidoStatus(idPedido, idStatus), HttpStatus.OK);
+	@PutMapping
+	public ResponseEntity<Pedido> updatePedido(@RequestBody Pedido pedido) {
+		Pedido pedidoAtualizado = pedidoService.updatePedido(pedido);
+		return new ResponseEntity<>(pedidoAtualizado, HttpStatus.OK);
 	}
+
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deletePedidoById(@PathVariable Integer id) {
-		if (pedidoService.findPedidoByIdDTO(id) == null) {
-			throw new NoSuchElementFoundException(
-					"Não foi possível excluir. O Pedido de id = " + id + " não foi encontrado.");
-		}
-
 		pedidoService.deletePedidoById(id);
-		return new ResponseEntity<>("O Pedido de id = " + id + " foi excluído com sucesso.", HttpStatus.OK);
+		return new ResponseEntity<>("", HttpStatus.OK);
 	}
 
 }
+
