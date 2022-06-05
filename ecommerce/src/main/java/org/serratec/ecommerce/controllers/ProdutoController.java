@@ -6,7 +6,7 @@ import javax.validation.Valid;
 
 import org.serratec.ecommerce.dtos.ProdutoGetDTO;
 import org.serratec.ecommerce.dtos.ProdutoPostDTO;
-import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
+import org.serratec.ecommerce.exceptions.ErrorResponse;
 import org.serratec.ecommerce.services.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,98 +23,85 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/produto")
+@Tag(name = "Produto")
 public class ProdutoController {
-	
+
 	@Autowired
 	ProdutoService produtoService;
-	
-	
 
 	@GetMapping
+	@Operation(summary = "Busca todos os produtos cadastrados.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os produtos cadastrados.", content = 	@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProdutoGetDTO.class)))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum produto encontrado.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<List<ProdutoGetDTO>> findAllProduto() {
-		List<ProdutoGetDTO> produtoList = produtoService.findAllProduto();
-		if(produtoList.isEmpty()) {
-			throw new NoSuchElementFoundException("Não foi encontrado nenhum produto");
-		}
-		return new ResponseEntity<>(produtoList, HttpStatus.OK);
+		return new ResponseEntity<>(produtoService.findAllProduto(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
+	@Operation(summary = "Busca um produto cadastrado através do seu ID.", parameters = {
+		@Parameter(name = "id", description = "Id do produto desejado.") }, responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o produto desejado.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> findProdutoByIdDTO(@PathVariable Integer id) {
-		ProdutoGetDTO produtoDto = produtoService.findProdutoByIdDTO(id);
-		if (produtoDto == null) {
-			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
-		}
-		return new ResponseEntity<>(produtoDto, HttpStatus.OK);
+		return new ResponseEntity<>(produtoService.findProdutoByIdDTO(id), HttpStatus.OK);
 	}
 
 	@PostMapping
+	@Operation(summary = "Cadastra um novo produto.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo produto.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> saveProdutoDTO(@Valid @RequestBody ProdutoPostDTO produtoDto) {
-		ProdutoGetDTO produtoNovo = produtoService.findProdutoByDescricaoDto(produtoDto);
-		if (produtoNovo != null) {
-			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException(
-					"O produto de id: " + produtoNovo.getIdProduto() + " já possui essa descrição");
-		}
-				
 		return new ResponseEntity<>(produtoService.saveProdutoDTO(produtoDto), HttpStatus.CREATED);
-
 	}
-	
+
 	@PostMapping(value = "/com-foto", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.MULTIPART_FORM_DATA_VALUE })
-	public ResponseEntity<ProdutoGetDTO> saveProdutoDtoComFoto(@Valid @RequestPart("produto") ProdutoPostDTO produtoDto,
-			@RequestPart("file") MultipartFile file) throws Exception {
-		
-		
-		ProdutoGetDTO produtoBD = produtoService.findProdutoByDescricaoDto(produtoDto);
-		
-		if (produtoBD != null) {
-			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException(
-					"O produto de id: " + produtoBD.getIdProduto() + " já possui essa descrição");
-		}
-		
+	@Operation(summary = "Cadastra um novo produto com uma foto.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo produto com foto.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
+	public ResponseEntity<ProdutoGetDTO> saveProdutoDtoComFoto(@Valid @RequestPart("produto") ProdutoPostDTO produtoDto, @RequestPart("file") MultipartFile file) throws Exception {
 		return new ResponseEntity<>(produtoService.saveProdutoDtoComFoto(produtoDto, file), HttpStatus.CREATED);
 	}
 
 	@PutMapping
+	@Operation(summary = "Atualiza um produto cadastrado.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o produto desejado.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> updateProduto(@Valid @RequestBody ProdutoPostDTO produtoDto) {
-		if (produtoDto.getIdProduto() == null) {
-			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException("Não foi informado um ID");
-		}
-		ProdutoGetDTO produtoAtualizado = produtoService.updateProduto(produtoDto);
-		if(produtoAtualizado==null) {
-			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException(
-					"Já existe um produto cadastrado com essa descrição");
-		}
-		return new ResponseEntity<>(produtoAtualizado, HttpStatus.OK);
+		return new ResponseEntity<>(produtoService.updateProduto(produtoDto), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<ProdutoGetDTO> updateProdutoById(@PathVariable Integer id, @Valid @RequestBody ProdutoPostDTO produtoDto) {
-		if (id == null) {
-			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException("Não foi informado um ID");
-		}
-		ProdutoGetDTO produtoAtualizado = produtoService.updateProdutoById(produtoDto,id);
-		if(produtoAtualizado==null) {
-			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException(
-					"Já existe um produto cadastrado com essa descrição");
-		}
-		return new ResponseEntity<>(produtoAtualizado, HttpStatus.OK);
+	@Operation(summary = "Atualiza um produto cadastrado através do seu ID.", parameters = {
+		@Parameter(name = "id", description = "Id do produto desejado.") }, responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o produto desejado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
+	public ResponseEntity<ProdutoGetDTO> updateProdutoById(@PathVariable Integer id,
+	@Valid @RequestBody ProdutoPostDTO produtoDto) {
+		return new ResponseEntity<>(produtoService.updateProdutoById(produtoDto, id), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
+	@Operation(summary = "Exclui um produto cadastrado através do seu ID.", parameters = {
+	@Parameter(name = "id", description = "Id do produto desejado.") }, responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui o produto desejado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<String> deleteProdutoById(@PathVariable Integer id) {
-		if (produtoService.findProdutoByIdDTO(id) == null) {
-			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
-		}
 		produtoService.deleteProdutoById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
