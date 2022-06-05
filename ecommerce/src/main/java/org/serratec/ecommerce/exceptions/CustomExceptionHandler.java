@@ -97,5 +97,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do cliente.", details);
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
-
+	
+	@ExceptionHandler(EnderecoException.class)
+	public final ResponseEntity<Object> handleEnderecoException(EnderecoException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do endereço.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
 }
