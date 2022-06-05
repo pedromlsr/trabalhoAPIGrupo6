@@ -56,8 +56,7 @@ public class ClienteService {
 			Cliente novoCliente = clienteRepository.save(DTOParaEntidade(clienteDTO));			
 			enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(), clienteDTO.getNumero(), clienteDTO.getComplemento());
 			
-			
-			return EntidadeParaDTO(novoCliente);
+			return EntidadeParaDTO(clienteRepository.save(novoCliente));
 		}
 	}
 
