@@ -19,6 +19,9 @@ public class ClienteService {
 	@Autowired
 	ClienteRepository clienteRepository;
 
+	@Autowired
+	EnderecoService enderecoService;
+
 	public List<ClienteDTO> findAllCliente() {
 		List<Cliente> listClienteEntidade = clienteRepository.findAll();
 		List<ClienteDTO> listClienteDTO = new ArrayList<ClienteDTO>();
@@ -48,9 +51,7 @@ public class ClienteService {
 		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
 			throw new ClienteException("Nome com apenas letras.");
 		} else {
-			Cliente cliente = DTOParaEntidade(clienteDTO);
-			cliente = clienteRepository.save(cliente);
-			return EntidadeParaDTO(cliente);
+			return EntidadeParaDTO(clienteRepository.save(DTOParaEntidade(clienteDTO)));
 		}
 	}
 
@@ -69,9 +70,7 @@ public class ClienteService {
 		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
 			throw new ClienteException("Nome com apenas letras.");
 		} else {
-			Cliente cliente = DTOParaEntidade(clienteDTO);
-			cliente = clienteRepository.save(cliente);
-			return EntidadeParaDTO(clienteRepository.save(cliente));
+			return EntidadeParaDTO(clienteRepository.save(DTOParaEntidade(clienteDTO)));
 		}
 
 	}
@@ -83,11 +82,13 @@ public class ClienteService {
 	private Cliente DTOParaEntidade(ClienteDTO clienteDTO) {
 		Cliente cliente = new Cliente();
 
+		cliente.setIdCliente(clienteDTO.getIdCliente());
 		cliente.setEmail(clienteDTO.getEmail());
 		cliente.setNomeCompleto(clienteDTO.getNomeCompleto());
 		cliente.setCpf(clienteDTO.getCpf());
 		cliente.setTelefone(clienteDTO.getTelefone());
 		cliente.setDataNascimento(clienteDTO.getDataNascimento());
+		cliente.setEndereco(enderecoService.findEnderecoById(clienteDTO.getIdEndereco()));
 
 		return cliente;
 	}
@@ -95,11 +96,15 @@ public class ClienteService {
 	private ClienteDTO EntidadeParaDTO(Cliente cliente) {
 		ClienteDTO clienteDTO = new ClienteDTO();
 
+		clienteDTO.setIdCliente(cliente.getIdCliente());
 		clienteDTO.setEmail(cliente.getEmail());
 		clienteDTO.setNomeCompleto(cliente.getNomeCompleto());
 		clienteDTO.setCpf(cliente.getCpf());
 		clienteDTO.setTelefone(cliente.getTelefone());
 		clienteDTO.setDataNascimento(cliente.getDataNascimento());
+		if (cliente.getEndereco() != null) {
+			clienteDTO.setIdEndereco(cliente.getEndereco().getIdEndereco());
+		}
 
 		return clienteDTO;
 	}
