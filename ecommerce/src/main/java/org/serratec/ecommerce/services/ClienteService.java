@@ -10,6 +10,7 @@ import org.serratec.ecommerce.entities.Cliente;
 import org.serratec.ecommerce.exceptions.ClienteException;
 import org.serratec.ecommerce.exceptions.CpfException;
 import org.serratec.ecommerce.exceptions.EmailException;
+import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class ClienteService {
 				: null;
 	}
 
-	public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
+	public ClienteDTO saveCliente(ClienteDTO clienteDTO) throws EnderecoException {
 		Boolean cpfExistente = clienteRepository.existsByCpf(clienteDTO.getCpf());
 		Boolean emailExistente = clienteRepository.existsByEmail(clienteDTO.getEmail());
 
@@ -51,7 +52,12 @@ public class ClienteService {
 		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
 			throw new ClienteException("Nome com apenas letras.");
 		} else {
-			return EntidadeParaDTO(clienteRepository.save(DTOParaEntidade(clienteDTO)));
+			
+			Cliente novoCliente = clienteRepository.save(DTOParaEntidade(clienteDTO));			
+			enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(), clienteDTO.getNumero(), clienteDTO.getComplemento());
+			
+			
+			return EntidadeParaDTO(novoCliente);
 		}
 	}
 
@@ -88,7 +94,8 @@ public class ClienteService {
 		cliente.setCpf(clienteDTO.getCpf());
 		cliente.setTelefone(clienteDTO.getTelefone());
 		cliente.setDataNascimento(clienteDTO.getDataNascimento());
-		//cliente.setEndereco(enderecoService.findEnderecoById(clienteDTO.getIdEndereco()));
+		if(clienteDTO.getIdEndereco()!=null)
+		cliente.setEndereco(enderecoService.findEnderecoById(clienteDTO.getIdEndereco()));
 
 		return cliente;
 	}
@@ -104,6 +111,9 @@ public class ClienteService {
 		clienteDTO.setDataNascimento(cliente.getDataNascimento());
 		if (cliente.getEndereco() != null) {
 			clienteDTO.setIdEndereco(cliente.getEndereco().getIdEndereco());
+			clienteDTO.setCep(cliente.getEndereco().getCep());
+			clienteDTO.setNumero(cliente.getEndereco().getNumero());
+			clienteDTO.setComplemento(cliente.getEndereco().getComplemento());
 		}
 
 		return clienteDTO;

@@ -9,14 +9,6 @@ public class ProdutoGetDTO {
 	private String descricaoProduto;
 	private Integer qtdEstoque;
 	private Double valorUnitario;
-	public String getNomeCategoria() {
-		return nomeCategoria;
-	}
-
-	public void setNomeCategoria(String nomeCategoria) {
-		this.nomeCategoria = nomeCategoria;
-	}
-
 	private LocalDate dataCadastro;	
 	private String nomeCategoria;
 
@@ -66,6 +58,13 @@ public class ProdutoGetDTO {
 
 	public void setDataCadastro(LocalDate dataCadastro) {
 		this.dataCadastro = dataCadastro;
+	}
+	public String getNomeCategoria() {
+		return nomeCategoria;
+	}
+
+	public void setNomeCategoria(String nomeCategoria) {
+		this.nomeCategoria = nomeCategoria;
 	}
 
 }

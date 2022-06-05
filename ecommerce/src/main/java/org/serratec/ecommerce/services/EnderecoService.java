@@ -24,10 +24,11 @@ public class EnderecoService {
 
 	@Autowired
 	ClienteRepository clienteRepository;
+	
 
 	public List<EnderecoDTO> findAllEndereco() {
 		if (enderecoRepository.findAll().isEmpty()) {
-			return null;
+			throw new NoSuchElementFoundException("Não foi encontrado nenhum endereço");
 		} else {
 			List<EnderecoDTO> enderecoDTOList = new ArrayList<>();
 
@@ -38,7 +39,16 @@ public class EnderecoService {
 		}
 	}
 
-	public EnderecoDTO findEnderecoById(Integer idEndereco) {
+	public Endereco findEnderecoById(Integer idEndereco) {
+		if (enderecoRepository.findById(idEndereco).isPresent()) {
+			return enderecoRepository.findById(idEndereco).isPresent()
+					? enderecoRepository.findById(idEndereco).get()
+							: null;
+		} else {
+			throw new NoSuchElementFoundException("Endereço de id " + idEndereco + " não foi encontrado.");
+		}
+	}
+	public EnderecoDTO findEnderecoByIdDTO(Integer idEndereco) {
 		if (enderecoRepository.findById(idEndereco).isPresent()) {
 			return enderecoRepository.findById(idEndereco).isPresent()
 					? EntidadeParaDTO(enderecoRepository.findById(idEndereco).get())
@@ -67,12 +77,18 @@ public class EnderecoService {
 
 		CadastroEnderecoDTO cadCepDTO = consultarEnderecoPorCep(limpezaCep);
 		Endereco endereco = cepDTOParaEndereco(cadCepDTO);
-
 		endereco.setNumero(numero);
 		endereco.setComplemento(complemento);
 		endereco.setCep(limpezaCep);
-
-		return EntidadeParaDTO(enderecoRepository.save(endereco));
+		
+		EnderecoDTO novoEndereco = EntidadeParaDTO(enderecoRepository.save(endereco));
+		
+		
+		Cliente cliente = clienteRepository.findById(idCliente).get();
+		cliente.setEndereco(endereco);
+		cliente.getEndereco().setIdEndereco(endereco.getIdEndereco());
+		
+		return novoEndereco;
 	}
 
 	public EnderecoDTO updateEnderecoDTO(Integer idEndereco, EnderecoDTO enderecoDTO) throws EnderecoException {

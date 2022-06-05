@@ -37,7 +37,38 @@ public class ClienteDTO {
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date dataNascimento;
 	
+	@NotNull(message = "Campo CEP não informado.")
+	private String cep;
+	
+	private String numero;
+	
+	private String complemento;
+	
 	private Integer idEndereco;
+
+	public Integer getIdEndereco() {
+		return idEndereco;
+	}
+
+	public void setIdEndereco(Integer idEndereco) {
+		this.idEndereco = idEndereco;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+
+	public String getComplemento() {
+		return complemento;
+	}
+
+	public void setComplemento(String complemento) {
+		this.complemento = complemento;
+	}
 
 	@Override
 	public String toString() {
@@ -92,12 +123,13 @@ public class ClienteDTO {
 		this.dataNascimento = dataNascimento;
 	}
 
-	public Integer getIdEndereco() {
-		return idEndereco;
+	public String getCep() {
+		return cep;
 	}
 
-	public void setIdEndereco(Integer idEndereco) {
-		this.idEndereco = idEndereco;
+	public void setCep(String cep) {
+		this.cep = cep;
 	}
+
 
 }
