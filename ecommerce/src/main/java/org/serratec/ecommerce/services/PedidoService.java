@@ -10,6 +10,7 @@ import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
+import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
 import org.serratec.ecommerce.repositories.StatusRepository;
@@ -35,7 +36,7 @@ public class PedidoService {
 
 	public List<PedidoResDTO> findAllPedido() {
 		if (pedidoRepository.findAll().isEmpty()) {
-			return null;
+			throw new NoSuchElementFoundException("Nenhum pedido encontrado.");
 		} else {
 			List<PedidoResDTO> pedidoResDTOList = new ArrayList<>();
 
@@ -64,7 +65,7 @@ public class PedidoService {
 	
 	public PedidoResDTO findPedidoByIdDTO(Integer id) {		
 		if(!pedidoRepository.existsById(id)) {
-			return null;
+			throw new NoSuchElementFoundException("O Pedido de id = " + id + " não foi encontrado.");
 		}		
 		Pedido pedido = pedidoRepository.findById(id).get();
 		Double valorLiqTotal = 0.0;
@@ -103,26 +104,22 @@ public class PedidoService {
 	}
 
 	public PedidoResDTO updatePedido(PedidoReqDTO pedidoReqDTO) {
-
+		if (!pedidoRepository.existsById(pedidoReqDTO.getIdPedido())) {
+			throw new NoSuchElementFoundException("Não foi possível atualizar. O Pedido de id = "
+					+ pedidoReqDTO.getIdPedido() + " não foi encontrado.");
+		}
+		
+		if (findPedidoById(pedidoReqDTO.getIdPedido()).getStatus().getIdStatus() != 1) {
+			//Criar exception customizada
+			throw new NoSuchElementFoundException("Esta requisição só pode ser realizada enquanto o pedido estiver em status de 'Aguardando pagamento'.");
+		}
+		
 		Pedido pedidoBD = findPedidoById(pedidoReqDTO.getIdPedido());
 
-		if (pedidoReqDTO.getItemPedidoList().size() >= pedidoBD.getItemPedidoList().size()) {
-
-			for (int i = 0; i < pedidoBD.getItemPedidoList().size(); i++) {
-
-				pedidoReqDTO.getItemPedidoList().get(i)
-						.setIdItemPedido(pedidoBD.getItemPedidoList().get(i).getIdItemPedido());
-
-			}
-
-		} else {
-			
-			for (ItemPedido itemPedido : pedidoBD.getItemPedidoList()) {
-				itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
-			}
-
+		for (ItemPedido itemPedido : pedidoBD.getItemPedidoList()) {
+			itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
 		}
-
+		
 		PedidoReqDTO novoPedidoReqDTO = itemPedidoService.salvarItemPedido(pedidoReqDTO);
 
 		PedidoResDTO pedidoResDTO = convertEntityToDTO(pedidoRepository.findById(pedidoReqDTO.getIdPedido()).get());
@@ -134,6 +131,25 @@ public class PedidoService {
 	}
 
 	public PedidoResDTO updatePedidoStatus(Integer idPedido, Integer idStatus) {
+		if (!pedidoRepository.existsById(idPedido)) {
+			throw new NoSuchElementFoundException(
+					"Não foi possível atualizar. O Pedido de id = " + idPedido + " não foi encontrado.");
+		}
+		if (idStatus != 2 && idStatus != 3) {
+			// Criar exception customizada
+			throw new NoSuchElementFoundException(
+					"Esta requisição só pode ser realizada para os status de id 2 e 3 (Enviado e Entregue).");
+		}
+		if (idStatus == 3 && (findPedidoById(idPedido).getDataEnvio() == null)) {
+			// Criar exception customizada
+			throw new NoSuchElementFoundException(
+					"Não é possível definir como entregue um pedido que ainda não foi enviado.");
+		}
+		if (findPedidoById(idPedido).getDataEntrega() != null) {
+			throw new NoSuchElementFoundException(
+					"Não é possível alterar o status de um pedido já finalizado.");
+		}
+		
 		Pedido pedido = pedidoRepository.findById(idPedido).get();
 
 		pedido.setStatus(statusRepository.findById(idStatus).get());
@@ -149,12 +165,12 @@ public class PedidoService {
 		return convertEntityToDTO(pedidoRepository.save(pedido));
 	}
 
-	public Pedido atualizarEnvioPedido(Pedido pedido) {
-		return pedidoRepository.save(pedido);
-	}
-
 	public void deletePedidoById(Integer id) {
-
+		if (!pedidoRepository.existsById(id)) {
+			throw new NoSuchElementFoundException(
+					"Não foi possível excluir. O Pedido de id = " + id + " não foi encontrado.");
+		}
+		
 		for (ItemPedido itemPedido : itemPedidoService.findAllItemPedido()) {
 
 			if (itemPedido.getPedido().getIdPedido() == id) {
@@ -164,10 +180,6 @@ public class PedidoService {
 		pedidoRepository.deleteById(id);
 
 	}
-
-//	private Pedido convertDTOToEntity(PedidoReqDTO pedidoReqDTO) {
-//	
-//	}
 
 	private PedidoResDTO convertEntityToDTO(Pedido pedido) {
 		PedidoResDTO pedidoResDTO = new PedidoResDTO();
