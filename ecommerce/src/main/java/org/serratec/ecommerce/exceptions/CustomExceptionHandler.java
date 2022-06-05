@@ -88,5 +88,42 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do endereço.", details);
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(ProdutoException.class)
+	public final ResponseEntity<Object> handleProdutoException(ProdutoException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do produto.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(PedidoException.class)
+	public final ResponseEntity<Object> handlePedidoException(PedidoException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do pedido.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(CategoriaException.class)
+	public final ResponseEntity<Object> handleCategoriaException(CategoriaException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro da categoria.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(ItemPedidoException.class)
+	public final ResponseEntity<Object> handleItemPedidoException(ItemPedidoException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do item pedido.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+	
 
 }
