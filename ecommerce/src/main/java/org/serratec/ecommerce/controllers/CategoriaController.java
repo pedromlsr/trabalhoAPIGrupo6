@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/categoria")
-@Tag(name = "Categoria", description = "endpoints")
+@Tag(name = "Categoria")
 public class CategoriaController {
 	@Autowired
 	CategoriaService categoriaService;

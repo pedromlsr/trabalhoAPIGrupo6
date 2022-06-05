@@ -28,74 +28,90 @@ public class ProdutoService {
 
 	public List<ProdutoGetDTO> findAllProduto() {
 		List<ProdutoGetDTO> listProdutoDto = new ArrayList<ProdutoGetDTO>();
+
 		List<Produto> listProduto = produtoRepository.findAll();
 		for (Produto produto : listProduto) {
 			listProdutoDto.add(convertEntityToDto(produto));
 		}
+		if (listProduto.isEmpty()) {
+			throw new NoSuchElementFoundException("Não foi encontrado nenhum produto");
+		}
+
 		return listProdutoDto;
 	}
 
 	public Produto findProdutoById(Integer id) {
-		return produtoRepository.findById(id).isPresent() ? produtoRepository.findById(id).get() : null;
+		if (!produtoRepository.findById(id).isPresent()) {
+			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
+		}
+		return produtoRepository.findById(id).get();
 	}
 
 	public ProdutoGetDTO findProdutoByIdDTO(Integer id) {
-		return produtoRepository.findById(id).isPresent() ? convertEntityToDto(produtoRepository.findById(id).get())
-				: null;
-	}
-
-	public ProdutoGetDTO findProdutoByDescricaoDto(ProdutoPostDTO produtoDto) {
-
-		Produto produto = produtoRepository.findByDescricaoProdutoIgnoreCase(produtoDto.getDescricaoProduto());
-		if (produto == null) {
-			return null;
+		if (!produtoRepository.findById(id).isPresent()) {
+			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
 		}
 
-		return convertEntityToDto(produto);
-	}
+		return convertEntityToDto(produtoRepository.findById(id).get());
+	}	
 
 	public ProdutoGetDTO saveProdutoDTO(ProdutoPostDTO produtoDto) {
+
+		findProdutoByDescricaoDto(produtoDto);
 		verificaCategoria(produtoDto);
+
 		Produto produto = convertDtoToEntity(produtoDto);
 		produto.setDataCadastro(LocalDate.now());
+
 		return convertEntityToDto(produtoRepository.save(produto));
 	}
 
 	public ProdutoGetDTO saveProdutoDtoComFoto(ProdutoPostDTO produtoDto, MultipartFile file) throws Exception {
+
+		findProdutoByDescricaoDto(produtoDto);
+		verificaCategoria(produtoDto);
+				
+		
 		Produto produtoBD = convertDtoToEntity(produtoDto);
 		produtoRepository.save(produtoBD);
 		produtoBD.setNomeImagemProduto(produtoBD.getIdProduto() + "_" + file.getOriginalFilename());
 		produtoBD.setDataCadastro(LocalDate.now());
+
 		Produto produtoAtualizado = produtoRepository.save(produtoBD);
 
 		arquivoToService.criarArquivo(produtoBD.getIdProduto() + "_" + file.getOriginalFilename(), file);
-		ProdutoGetDTO produtoGetDto = convertEntityToDto(produtoAtualizado);
 
-		return produtoGetDto;
+		return convertEntityToDto(produtoAtualizado);
 	}
 
 	public ProdutoGetDTO updateProduto(ProdutoPostDTO produtoDto) {
-		verificaCategoria(produtoDto);
-		Produto produtoBD = produtoRepository.findByDescricaoProdutoIgnoreCase(produtoDto.getDescricaoProduto());
-		if (produtoBD != null && produtoBD.getIdProduto() != produtoDto.getIdProduto()) {
-			return null;
+		
+		if (produtoDto.getIdProduto() == null) {
+			// Precisa trocar o tipo de Exception
+			throw new NoSuchElementFoundException("Não foi informado um ID");
 		}
-		produtoBD = findProdutoById(produtoDto.getIdProduto());
+		
+		Produto produtoBD= convertDtoToEntity(findProdutoByDescricaoDto(produtoDto));
+		verificaCategoria(produtoDto);				
+		
 		Produto produtoAtualizado = convertDtoToEntity(produtoDto);
+		produtoBD = findProdutoById(produtoDto.getIdProduto());
 		produtoAtualizado.setDataCadastro(produtoBD.getDataCadastro());
 
 		return convertEntityToDto(produtoRepository.save(produtoAtualizado));
 	}
 
 	public ProdutoGetDTO updateProdutoById(ProdutoPostDTO produtoDto, Integer id) {
-
+		
 		produtoDto.setIdProduto(id);
 
 		return updateProduto(produtoDto);
-
 	}
 
 	public void deleteProdutoById(Integer id) {
+		if (findProdutoByIdDTO(id) == null) {
+			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
+		}
 		produtoRepository.deleteById(id);
 	}
 
@@ -123,6 +139,17 @@ public class ProdutoService {
 		produtoDto.setDataCadastro(produto.getDataCadastro());
 		if (produto.getCategoria() != null)
 			produtoDto.setNomeCategoria(produto.getCategoria().getNomeCategoria());
+
+		return produtoDto;
+	}
+	
+	public ProdutoPostDTO findProdutoByDescricaoDto(ProdutoPostDTO produtoDto) {
+
+		Produto produtoBD = produtoRepository.findByDescricaoProdutoIgnoreCase(produtoDto.getDescricaoProduto());
+		if (produtoBD != null && produtoBD.getIdProduto() != produtoDto.getIdProduto()) {
+			throw new NoSuchElementFoundException(
+					"O produto de id: " + produtoBD.getIdProduto() + " já possui essa descrição");
+		}
 
 		return produtoDto;
 	}

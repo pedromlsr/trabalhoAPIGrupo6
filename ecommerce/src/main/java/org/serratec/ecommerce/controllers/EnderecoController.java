@@ -3,7 +3,6 @@ package org.serratec.ecommerce.controllers;
 import java.util.List;
 
 import org.serratec.ecommerce.dtos.EnderecoDTO;
-import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.exceptions.ErrorResponse;
 import org.serratec.ecommerce.services.EnderecoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -77,10 +72,11 @@ public class EnderecoController {
 
 */
 	@DeleteMapping
-	@Operation(summary = "Exclui um endereço cadastrado.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui o endereço desejado.", content = @Content),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um endereço com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
+	@Operation(summary = "Exclui um endereço cadastrado.", parameters = {
+			@Parameter(name = "id", description = "Id do endereço desejado.") }, responses = {
+					@ApiResponse(responseCode = "200", description = "Sucesso. Exclui o endereço desejado.", content = @Content),
+					@ApiResponse(responseCode = "404", description = "Falha. Não há um endereço com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 
 	public ResponseEntity<String> deleteEnderecoById(@PathVariable Integer id) throws Exception {
 		enderecoService.deleteByIdEndereco(id);
