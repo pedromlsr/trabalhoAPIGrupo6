@@ -7,12 +7,15 @@ import java.util.regex.Pattern;
 
 import org.serratec.ecommerce.dtos.ClienteDTO;
 import org.serratec.ecommerce.entities.Cliente;
+import org.serratec.ecommerce.entities.ItemPedido;
+import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.exceptions.ClienteException;
 import org.serratec.ecommerce.exceptions.CpfException;
 import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
+import org.serratec.ecommerce.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,12 @@ public class ClienteService {
 
 	@Autowired
 	EnderecoService enderecoService;
+
+	@Autowired
+	PedidoRepository pedidoRepository;
+
+	@Autowired
+	ItemPedidoService itemPedidoService;
 
 	public List<ClienteDTO> findAllCliente() {
 		List<Cliente> listClienteEntidade = clienteRepository.findAll();
@@ -42,22 +51,22 @@ public class ClienteService {
 
 	public ClienteDTO saveCliente(ClienteDTO clienteDTO) throws EnderecoException {
 
-		Boolean cpfExistente = clienteRepository.existsByCpf(clienteDTO.getCpf());
-		Boolean emailExistente = clienteRepository.existsByEmail(clienteDTO.getEmail());
+		Cliente clienteCpfExistente = clienteRepository.findByCpf(clienteDTO.getCpf());
+		Cliente clienteEmailExistente = clienteRepository.findByEmail(clienteDTO.getEmail());
 
 		if (clienteDTO.getIdCliente() != null) {
-			Cliente clienteBD = clienteRepository.findById(clienteDTO.getIdCliente()).get();
 
-			if (cpfExistente == true && clienteDTO.getIdCliente() != clienteBD.getIdCliente()) {
+			if (clienteCpfExistente != null && clienteDTO.getIdCliente() != clienteCpfExistente.getIdCliente()) {
 				throw new CpfException("CPF já registrado.");
-			} else if (emailExistente == true && clienteDTO.getIdCliente() != clienteBD.getIdCliente()) {
+			} else if (clienteEmailExistente != null
+					&& clienteDTO.getIdCliente() != clienteEmailExistente.getIdCliente()) {
 				throw new EmailException("Email já registrado.");
 			}
 
 		} else {
-			if (cpfExistente == true) {
+			if (clienteCpfExistente != null) {
 				throw new CpfException("CPF já registrado.");
-			} else if (emailExistente == true) {
+			} else if (clienteEmailExistente != null) {
 				throw new EmailException("Email já registrado.");
 			}
 		}
@@ -75,6 +84,7 @@ public class ClienteService {
 
 			return EntidadeParaDTO(clienteRepository.save(novoCliente));
 		}
+
 	}
 
 	public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
@@ -87,7 +97,7 @@ public class ClienteService {
 
 	public ClienteDTO updateCliente(ClienteDTO clienteDTO)
 			throws CpfException, EmailException, ClienteException, EnderecoException {
-		
+
 		if (clienteDTO.getIdCliente() == null) {
 			throw new ClienteException("Não foi informado um ID");
 		}
@@ -98,18 +108,28 @@ public class ClienteService {
 		if (clienteBD == null) {
 			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado");
 		}
-		if (!validate(clienteDTO.getEmail())) {
-			throw new EmailException("Email inválido.");
-		}
-		if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
-			throw new ClienteException("Nome com apenas letras.");
-		}
 
 		return saveCliente(clienteDTO);
 
 	}
 
 	public void deleteClienteById(Integer idCliente) {
+
+		if (!clienteRepository.findById(idCliente).isPresent()) {
+			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado");
+		}
+
+		Cliente clienteBD = clienteRepository.findById(idCliente).get();
+
+		List<Pedido> pedidosCliente = pedidoRepository.findByCliente(clienteBD);
+
+		for (Pedido pedido : pedidosCliente) {
+			for (ItemPedido itemPedido : pedido.getItemPedidoList()) {
+				itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
+			}
+			pedidoRepository.deleteById(pedido.getIdPedido());
+		}
+
 		clienteRepository.deleteById(idCliente);
 	}
 

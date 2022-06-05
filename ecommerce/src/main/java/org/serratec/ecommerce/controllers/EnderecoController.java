@@ -47,7 +47,7 @@ public class EnderecoController {
 		return new ResponseEntity<>(enderecoService.updateEnderecoDTO(idEndereco, enderecoDTO), HttpStatus.OK);
 	}
 
-	@DeleteMapping
+	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteEnderecoById(@PathVariable Integer id) throws Exception {
 		enderecoService.deleteByIdEndereco(id);
 		return new ResponseEntity<>("", HttpStatus.OK);

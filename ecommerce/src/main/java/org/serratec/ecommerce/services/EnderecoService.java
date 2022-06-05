@@ -87,7 +87,6 @@ public class EnderecoService {
 		
 		EnderecoDTO novoEndereco = EntidadeParaDTO(enderecoRepository.save(endereco));
 		
-		
 		Cliente cliente = clienteRepository.findById(idCliente).get();
 		cliente.setEndereco(endereco);
 		cliente.getEndereco().setIdEndereco(endereco.getIdEndereco());
