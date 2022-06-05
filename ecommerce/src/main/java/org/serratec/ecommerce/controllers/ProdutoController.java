@@ -29,6 +29,8 @@ public class ProdutoController {
 	
 	@Autowired
 	ProdutoService produtoService;
+	
+	
 
 	@GetMapping
 	public ResponseEntity<List<ProdutoGetDTO>> findAllProduto() {
@@ -50,29 +52,31 @@ public class ProdutoController {
 
 	@PostMapping
 	public ResponseEntity<ProdutoGetDTO> saveProdutoDTO(@Valid @RequestBody ProdutoPostDTO produtoDto) {
-		ProdutoGetDTO produtoNovo = produtoService.findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
+		ProdutoGetDTO produtoNovo = produtoService.findProdutoByDescricaoDto(produtoDto);
 		if (produtoNovo != null) {
 			// Precisa trocar o tipo de Exception
 			throw new NoSuchElementFoundException(
 					"O produto de id: " + produtoNovo.getIdProduto() + " já possui essa descrição");
 		}
+				
 		return new ResponseEntity<>(produtoService.saveProdutoDTO(produtoDto), HttpStatus.CREATED);
 
 	}
 	
 	@PostMapping(value = "/com-foto", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.MULTIPART_FORM_DATA_VALUE })
-	public ResponseEntity<ProdutoGetDTO> saveProdutoDtoComFoto(@RequestPart("produto") String produto,
+	public ResponseEntity<ProdutoGetDTO> saveProdutoDtoComFoto(@Valid @RequestPart("produto") ProdutoPostDTO produtoDto,
 			@RequestPart("file") MultipartFile file) throws Exception {
 		
-		ProdutoPostDTO produtoDto = produtoService.convertStringToDto(produto);
-		ProdutoGetDTO produtoBD = produtoService.findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
+		
+		ProdutoGetDTO produtoBD = produtoService.findProdutoByDescricaoDto(produtoDto);
 		
 		if (produtoBD != null) {
 			// Precisa trocar o tipo de Exception
 			throw new NoSuchElementFoundException(
 					"O produto de id: " + produtoBD.getIdProduto() + " já possui essa descrição");
 		}
+		
 		return new ResponseEntity<>(produtoService.saveProdutoDtoComFoto(produtoDto, file), HttpStatus.CREATED);
 	}
 

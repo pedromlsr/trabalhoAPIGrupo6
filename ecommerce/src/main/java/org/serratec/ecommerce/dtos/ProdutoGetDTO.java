@@ -9,8 +9,16 @@ public class ProdutoGetDTO {
 	private String descricaoProduto;
 	private Integer qtdEstoque;
 	private Double valorUnitario;
+	public String getNomeCategoria() {
+		return nomeCategoria;
+	}
+
+	public void setNomeCategoria(String nomeCategoria) {
+		this.nomeCategoria = nomeCategoria;
+	}
+
 	private LocalDate dataCadastro;	
-	// private CategoriaDTO idCategoria;
+	private String nomeCategoria;
 
 	public Integer getIdProduto() {
 		return idProduto;

@@ -1,19 +1,18 @@
 package org.serratec.ecommerce.services;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.serratec.ecommerce.dtos.ProdutoGetDTO;
 import org.serratec.ecommerce.dtos.ProdutoPostDTO;
+import org.serratec.ecommerce.entities.Categoria;
 import org.serratec.ecommerce.entities.Produto;
+import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ProdutoService {
@@ -23,6 +22,9 @@ public class ProdutoService {
 
 	@Autowired
 	ArquivoToService arquivoToService;
+
+	@Autowired
+	CategoriaService categoriaService;
 
 	public List<ProdutoGetDTO> findAllProduto() {
 		List<ProdutoGetDTO> listProdutoDto = new ArrayList<ProdutoGetDTO>();
@@ -34,8 +36,7 @@ public class ProdutoService {
 	}
 
 	public Produto findProdutoById(Integer id) {
-		return produtoRepository.findById(id).isPresent() ? produtoRepository.findById(id).get()
-				: null;
+		return produtoRepository.findById(id).isPresent() ? produtoRepository.findById(id).get() : null;
 	}
 
 	public ProdutoGetDTO findProdutoByIdDTO(Integer id) {
@@ -43,37 +44,24 @@ public class ProdutoService {
 				: null;
 	}
 
-	public ProdutoGetDTO findProdutoByDescricaoDto(String descricaoProduto) {
-		Produto produto = produtoRepository.findByDescricaoProdutoIgnoreCase(descricaoProduto);
+	public ProdutoGetDTO findProdutoByDescricaoDto(ProdutoPostDTO produtoDto) {
+
+		Produto produto = produtoRepository.findByDescricaoProdutoIgnoreCase(produtoDto.getDescricaoProduto());
 		if (produto == null) {
 			return null;
 		}
+
 		return convertEntityToDto(produto);
 	}
 
 	public ProdutoGetDTO saveProdutoDTO(ProdutoPostDTO produtoDto) {
-
+		verificaCategoria(produtoDto);
 		Produto produto = convertDtoToEntity(produtoDto);
 		produto.setDataCadastro(LocalDate.now());
 		return convertEntityToDto(produtoRepository.save(produto));
 	}
 
-	public ProdutoPostDTO convertStringToDto(String produtoString) {
-
-		ProdutoPostDTO produtoDtoConvertido = new ProdutoPostDTO();
-		try {
-			ObjectMapper objMapper = new ObjectMapper();
-			produtoDtoConvertido = objMapper.readValue(produtoString, ProdutoPostDTO.class);
-
-		} catch (IOException e) {
-			System.out.println("Ocorreu um erro na conversão");
-		}
-
-		return produtoDtoConvertido;
-	}
-
 	public ProdutoGetDTO saveProdutoDtoComFoto(ProdutoPostDTO produtoDto, MultipartFile file) throws Exception {
-
 		Produto produtoBD = convertDtoToEntity(produtoDto);
 		produtoRepository.save(produtoBD);
 		produtoBD.setNomeImagemProduto(produtoBD.getIdProduto() + "_" + file.getOriginalFilename());
@@ -87,44 +75,23 @@ public class ProdutoService {
 	}
 
 	public ProdutoGetDTO updateProduto(ProdutoPostDTO produtoDto) {
-		ProdutoGetDTO produtoBD = findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
-		if (produtoBD != null && produtoBD.getIdProduto()!=produtoDto.getIdProduto()) {
+		verificaCategoria(produtoDto);
+		Produto produtoBD = produtoRepository.findByDescricaoProdutoIgnoreCase(produtoDto.getDescricaoProduto());
+		if (produtoBD != null && produtoBD.getIdProduto() != produtoDto.getIdProduto()) {
 			return null;
 		}
-		Produto produto = convertDtoToEntity(produtoDto);
-		produtoRepository.save(produto);
-		return convertEntityToDto(produto);
+		produtoBD = findProdutoById(produtoDto.getIdProduto());
+		Produto produtoAtualizado = convertDtoToEntity(produtoDto);
+		produtoAtualizado.setDataCadastro(produtoBD.getDataCadastro());
 
+		return convertEntityToDto(produtoRepository.save(produtoAtualizado));
 	}
 
 	public ProdutoGetDTO updateProdutoById(ProdutoPostDTO produtoDto, Integer id) {
-		
-		ProdutoGetDTO produtoBD = findProdutoByDescricaoDto(produtoDto.getDescricaoProduto());
-		if (produtoBD != null && produtoBD.getIdProduto()!=id) {
-			return null;
-		}
-		
-		Produto produtoAtualizado = new Produto();
-		produtoBD = findProdutoByIdDTO(id);
 
-		produtoAtualizado.setIdProduto(id);
-		produtoAtualizado.setNomeProduto(produtoDto.getNomeProduto());
-		produtoAtualizado.setDescricaoProduto(produtoDto.getDescricaoProduto());
-		produtoAtualizado.setValorUnitario(produtoDto.getValorUnitario());
-//		produtoAtualizado.setCategoria(produtoDto.getCategoria());
+		produtoDto.setIdProduto(id);
 
-		if (produtoBD != null) {
-			produtoAtualizado.setDataCadastro(produtoBD.getDataCadastro());
-		} else {
-			produtoAtualizado.setDataCadastro(LocalDate.now());
-		}
-		if (produtoDto.getQtdEstoque() != null) {
-			produtoAtualizado.setQtdEstoque(produtoDto.getQtdEstoque());
-		} else {
-			produtoAtualizado.setQtdEstoque(produtoBD.getQtdEstoque());
-		}
-
-		return convertEntityToDto(produtoRepository.save(produtoAtualizado));
+		return updateProduto(produtoDto);
 
 	}
 
@@ -140,6 +107,7 @@ public class ProdutoService {
 		produto.setDescricaoProduto(produtoDto.getDescricaoProduto());
 		produto.setValorUnitario(produtoDto.getValorUnitario());
 		produto.setQtdEstoque(produtoDto.getQtdEstoque());
+		produto.setCategoria(categoriaService.findCategoriaById(produtoDto.getIdCategoria()));
 
 		return produto;
 	}
@@ -153,8 +121,19 @@ public class ProdutoService {
 		produtoDto.setValorUnitario(produto.getValorUnitario());
 		produtoDto.setQtdEstoque(produto.getQtdEstoque());
 		produtoDto.setDataCadastro(produto.getDataCadastro());
+		if (produto.getCategoria() != null)
+			produtoDto.setNomeCategoria(produto.getCategoria().getNomeCategoria());
 
 		return produtoDto;
+	}
+
+	public void verificaCategoria(ProdutoPostDTO produtoDto) {
+		Categoria categoria = categoriaService.findCategoriaById(produtoDto.getIdCategoria());
+		if (categoria == null) {
+			throw new NoSuchElementFoundException(
+					"Não foi encontrada uma categoria para o Id: " + produtoDto.getIdCategoria());
+		}
+
 	}
 
 }
