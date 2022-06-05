@@ -5,6 +5,9 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.serratec.ecommerce.dtos.ClienteDTO;
+import org.serratec.ecommerce.exceptions.ClienteException;
+import org.serratec.ecommerce.exceptions.CpfException;
+import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +44,7 @@ public class ClienteController {
 	}
 
 	@PutMapping
-	public ResponseEntity<ClienteDTO> updateCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
+	public ResponseEntity<ClienteDTO> updateCliente(@Valid @RequestBody ClienteDTO clienteDTO) throws CpfException, EmailException, ClienteException, EnderecoException {
 		return new ResponseEntity<>(clienteService.updateCliente(clienteDTO), HttpStatus.OK);
 	}
 
