@@ -47,30 +47,50 @@ public class EnderecoController {
 	public ResponseEntity<EnderecoDTO> findEnderecoById(@PathVariable Integer id) {
 		return new ResponseEntity<>(enderecoService.findEnderecoByIdDTO(id), HttpStatus.OK);
 	}
-	
-	//Endpoints comentados para testar a necessidade deles aqui ou apenas através do ClienteController
-	
-	/*@PostMapping
-	@Operation(summary = "Cadastra um novo endereço.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo endereço.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EnderecoDTO.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
-	public ResponseEntity<EnderecoDTO> saveEndereco(@RequestParam Integer idCliente, @RequestParam String cep,
-			@RequestParam String numero, @RequestParam String complemento) throws EnderecoException {
-		return new ResponseEntity<>(enderecoService.saveEnderecoDTO(idCliente, cep, numero, complemento),
-				HttpStatus.CREATED);
-	}
 
-	@PutMapping
-	@Operation(summary = "Atualiza um endereço cadastrado.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o endereço desejado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EnderecoDTO.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um endereço com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
-	public ResponseEntity<EnderecoDTO> updateEndereco(@RequestParam Integer idEndereco,
-			@RequestBody EnderecoDTO enderecoDTO) throws EnderecoException {
-		return new ResponseEntity<>(enderecoService.updateEnderecoDTO(idEndereco, enderecoDTO), HttpStatus.OK);
-	}
+	// Endpoints comentados para testar a necessidade deles aqui ou apenas através
+	// do ClienteController
 
-*/
+	/*
+	 * @PostMapping
+	 * 
+	 * @Operation(summary = "Cadastra um novo endereço.", responses = {
+	 * 
+	 * @ApiResponse(responseCode = "200", description =
+	 * "Sucesso. Cadastra um novo endereço.", content = @Content(mediaType =
+	 * "application/json", schema = @Schema(implementation = EnderecoDTO.class))),
+	 * 
+	 * @ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.",
+	 * content = @Content) }) public ResponseEntity<EnderecoDTO>
+	 * saveEndereco(@RequestParam Integer idCliente, @RequestParam String cep,
+	 * 
+	 * @RequestParam String numero, @RequestParam String complemento) throws
+	 * EnderecoException { return new
+	 * ResponseEntity<>(enderecoService.saveEnderecoDTO(idCliente, cep, numero,
+	 * complemento), HttpStatus.CREATED); }
+	 * 
+	 * @PutMapping
+	 * 
+	 * @Operation(summary = "Atualiza um endereço cadastrado.", responses = {
+	 * 
+	 * @ApiResponse(responseCode = "200", description =
+	 * "Sucesso. Atualiza o endereço desejado.", content = @Content(mediaType =
+	 * "application/json", schema = @Schema(implementation = EnderecoDTO.class))),
+	 * 
+	 * @ApiResponse(responseCode = "404", description =
+	 * "Falha. Não há um endereço com o ID fornecido.", content = @Content(mediaType
+	 * = "application/json", schema = @Schema(implementation =
+	 * ErrorResponse.class))),
+	 * 
+	 * @ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.",
+	 * content = @Content) }) public ResponseEntity<EnderecoDTO>
+	 * updateEndereco(@RequestParam Integer idEndereco,
+	 * 
+	 * @RequestBody EnderecoDTO enderecoDTO) throws EnderecoException { return new
+	 * ResponseEntity<>(enderecoService.updateEnderecoDTO(idEndereco, enderecoDTO),
+	 * HttpStatus.OK); }
+	 * 
+	 */
 	@DeleteMapping
 	@Operation(summary = "Exclui um endereço cadastrado.", parameters = {
 			@Parameter(name = "id", description = "Id do endereço desejado.") }, responses = {
@@ -78,7 +98,7 @@ public class EnderecoController {
 					@ApiResponse(responseCode = "404", description = "Falha. Não há um endereço com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 
-	public ResponseEntity<String> deleteEnderecoById(@PathVariable Integer id) throws Exception {
+	public ResponseEntity<String> deleteEnderecoById(@PathVariable Integer id) {
 		enderecoService.deleteByIdEndereco(id);
 		return new ResponseEntity<>("", HttpStatus.OK);
 	}

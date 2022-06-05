@@ -24,7 +24,6 @@ public class EnderecoService {
 
 	@Autowired
 	ClienteRepository clienteRepository;
-	
 
 	public List<EnderecoDTO> findAllEndereco() {
 		if (enderecoRepository.findAll().isEmpty()) {
@@ -41,13 +40,13 @@ public class EnderecoService {
 
 	public Endereco findEnderecoById(Integer idEndereco) {
 		if (enderecoRepository.findById(idEndereco).isPresent()) {
-			return enderecoRepository.findById(idEndereco).isPresent()
-					? enderecoRepository.findById(idEndereco).get()
-							: null;
+			return enderecoRepository.findById(idEndereco).isPresent() ? enderecoRepository.findById(idEndereco).get()
+					: null;
 		} else {
 			throw new NoSuchElementFoundException("Endereço de id " + idEndereco + " não foi encontrado.");
 		}
 	}
+
 	public EnderecoDTO findEnderecoByIdDTO(Integer idEndereco) {
 		if (enderecoRepository.findById(idEndereco).isPresent()) {
 			return enderecoRepository.findById(idEndereco).isPresent()
@@ -58,8 +57,7 @@ public class EnderecoService {
 		}
 	}
 
-	public EnderecoDTO saveEnderecoDTO(Integer idCliente, String cep, String numero, String complemento)
-			throws EnderecoException {
+	public EnderecoDTO saveEnderecoDTO(Integer idCliente, String cep, String numero, String complemento) {
 		String limpezaCep = cep.replaceAll("[.-]", "");
 
 		if (!clienteRepository.findById(idCliente).isPresent()) {
@@ -74,7 +72,7 @@ public class EnderecoService {
 		if (numero == null) {
 			numero = "s/n";
 		}
-		
+
 		if (complemento == null) {
 			complemento = "";
 		}
@@ -84,17 +82,17 @@ public class EnderecoService {
 		endereco.setNumero(numero);
 		endereco.setComplemento(complemento);
 		endereco.setCep(limpezaCep);
-		
+
 		EnderecoDTO novoEndereco = EntidadeParaDTO(enderecoRepository.save(endereco));
-		
+
 		Cliente cliente = clienteRepository.findById(idCliente).get();
 		cliente.setEndereco(endereco);
 		cliente.getEndereco().setIdEndereco(endereco.getIdEndereco());
-		
+
 		return novoEndereco;
 	}
 
-	public EnderecoDTO updateEnderecoDTO(Integer idEndereco, EnderecoDTO enderecoDTO) throws EnderecoException {
+	public EnderecoDTO updateEnderecoDTO(Integer idEndereco, EnderecoDTO enderecoDTO) {
 		if (!enderecoRepository.findById(idEndereco).isPresent()) {
 			throw new NoSuchElementFoundException("Endereço com id " + idEndereco + " não foi encontrado");
 		}
@@ -109,9 +107,9 @@ public class EnderecoService {
 		return EntidadeParaDTO(enderecoRepository.save(DTOParaEntidade(enderecoDTO)));
 	}
 
-	public void deleteByIdEndereco(Integer idEndereco) throws Exception {
+	public void deleteByIdEndereco(Integer idEndereco) {
 		List<Integer> listaIdEnderecosCadastrados = new ArrayList<>();
-		
+
 		for (Cliente cliente : clienteRepository.findAll()) {
 			if (cliente.getEndereco() != null && cliente.getEndereco().getIdEndereco() == idEndereco) {
 				listaIdEnderecosCadastrados.add(cliente.getEndereco().getIdEndereco());
@@ -121,8 +119,9 @@ public class EnderecoService {
 		if (!enderecoRepository.findById(idEndereco).isPresent()) {
 			throw new NoSuchElementFoundException("Endereço com id " + idEndereco + " não foi encontrado");
 		} else if (!listaIdEnderecosCadastrados.isEmpty()) {
-			throw new EnderecoException("Não foi possível excluir esse endereço, existem clientes com esse endereço cadastrado");
-		}else {
+			throw new EnderecoException(
+					"Não foi possível excluir esse endereço, existem clientes com esse endereço cadastrado");
+		} else {
 			enderecoRepository.deleteById(idEndereco);
 		}
 	}

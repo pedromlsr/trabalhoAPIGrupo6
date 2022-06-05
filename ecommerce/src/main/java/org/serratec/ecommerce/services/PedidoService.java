@@ -11,6 +11,7 @@ import org.serratec.ecommerce.dtos.PedidoResDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
+import org.serratec.ecommerce.exceptions.PedidoException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
 import org.serratec.ecommerce.repositories.StatusRepository;
@@ -110,8 +111,7 @@ public class PedidoService {
 		}
 		
 		if (findPedidoById(pedidoReqDTO.getIdPedido()).getStatus().getIdStatus() != 1) {
-			//Criar exception customizada
-			throw new NoSuchElementFoundException("Esta requisição só pode ser realizada enquanto o pedido estiver em status de 'Aguardando pagamento'.");
+			throw new PedidoException("Esta requisição só pode ser realizada enquanto o pedido estiver em status de 'Aguardando pagamento'.");
 		}
 		
 		Pedido pedidoBD = findPedidoById(pedidoReqDTO.getIdPedido());
@@ -136,17 +136,15 @@ public class PedidoService {
 					"Não foi possível atualizar. O Pedido de id = " + idPedido + " não foi encontrado.");
 		}
 		if (idStatus != 2 && idStatus != 3) {
-			// Criar exception customizada
-			throw new NoSuchElementFoundException(
+			throw new PedidoException(
 					"Esta requisição só pode ser realizada para os status de id 2 e 3 (Enviado e Entregue).");
 		}
 		if (idStatus == 3 && (findPedidoById(idPedido).getDataEnvio() == null)) {
-			// Criar exception customizada
-			throw new NoSuchElementFoundException(
+			throw new PedidoException(
 					"Não é possível definir como entregue um pedido que ainda não foi enviado.");
 		}
 		if (findPedidoById(idPedido).getDataEntrega() != null) {
-			throw new NoSuchElementFoundException(
+			throw new PedidoException(
 					"Não é possível alterar o status de um pedido já finalizado.");
 		}
 		
