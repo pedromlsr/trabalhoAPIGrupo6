@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.serratec.ecommerce.entities.Categoria;
+import org.serratec.ecommerce.exceptions.CategoriaException;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class CategoriaService {
 	public Categoria saveCategoria(Categoria categoria) {
 
 		if (findCategoriaByNome(categoria) != null)
-			throw new NoSuchElementFoundException("Já possui uma categoria cadastrada com essa descrição");
+			throw new CategoriaException("Já possui uma categoria cadastrada com essa descrição");
 
 		return categoriaRepository.save(categoria);
 	}
@@ -48,7 +49,7 @@ public class CategoriaService {
 	public Categoria updateCategoria(Categoria categoria) {
 
 		if (categoria.getIdCategoria() == null) {
-			throw new NoSuchElementFoundException("Não foi informado um ID");
+			throw new CategoriaException("Não foi informado um ID");
 		}
 
 		Categoria categoriaAtualizada = findCategoriaById(categoria.getIdCategoria());
@@ -62,7 +63,7 @@ public class CategoriaService {
 		if (categoriaBD != null) {
 
 			if (categoriaAtualizada.getIdCategoria() != categoriaBD.getIdCategoria()) {
-				throw new NoSuchElementFoundException(
+				throw new CategoriaException(
 						"A categoria de ID: " + categoriaBD.getIdCategoria() + " já possui essa descrição");
 			}
 		}
