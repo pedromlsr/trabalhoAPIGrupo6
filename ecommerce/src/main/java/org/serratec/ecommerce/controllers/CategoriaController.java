@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.serratec.ecommerce.entities.Categoria;
 import org.serratec.ecommerce.exceptions.ErrorResponse;
-import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.services.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,10 +40,7 @@ public class CategoriaController {
 			@ApiResponse(responseCode = "404", description = "Falha. Nenhuma categoria encontrada.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<List<Categoria>> findAllCategoria() {
-		List<Categoria> categoriaList = categoriaService.findAllCategoria();
-		if (categoriaList.isEmpty())
-			throw new NoSuchElementFoundException("Não foi encontrada nenhuma categoria");
-		return new ResponseEntity<>(categoriaList, HttpStatus.OK);
+		return new ResponseEntity<>(categoriaService.findAllCategoria(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
@@ -54,10 +50,7 @@ public class CategoriaController {
 					@ApiResponse(responseCode = "404", description = "Falha. Não há uma categoria cadastrada com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<Categoria> findCategoriaById(@PathVariable Integer id) {
-		Categoria categoria = categoriaService.findCategoriaById(id);
-		if (categoria == null)
-			throw new NoSuchElementFoundException("Não foi encontrada categoria com o Id: " + id);
-		return new ResponseEntity<>(categoria, HttpStatus.OK);
+		return new ResponseEntity<>(categoriaService.findCategoriaById(id), HttpStatus.OK);
 	}
 
 	@PostMapping
@@ -65,11 +58,7 @@ public class CategoriaController {
 			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra uma nova categoria.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Categoria.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<Categoria> saveCategoria(@Valid @RequestBody Categoria categoria) {
-		Categoria novaCategoria = categoriaService.saveCategoria(categoria);
-		if (novaCategoria == null)
-			throw new NoSuchElementFoundException(
-					"Já existe uma categoria salva com o nome " + "'" + categoria.getNomeCategoria() + "' ");
-		return new ResponseEntity<>(novaCategoria, HttpStatus.CREATED);
+		return new ResponseEntity<>(categoriaService.saveCategoria(categoria), HttpStatus.CREATED);
 	}
 
 	@PutMapping
@@ -78,13 +67,7 @@ public class CategoriaController {
 			@ApiResponse(responseCode = "404", description = "Falha. Não há uma categoria com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<Categoria> updateCategoria(@Valid @RequestBody Categoria categoria) {
-		if (categoria.getIdCategoria() == null)
-			throw new NoSuchElementFoundException("Não foi informado um ID");
-		Categoria categoriaAtualizado = categoriaService.updateCategoria(categoria);
-		if (categoriaAtualizado == null)
-			throw new NoSuchElementFoundException(
-					"Não foi encontrada categoria com o Id: " + categoria.getIdCategoria());
-		return new ResponseEntity<>(categoriaAtualizado, HttpStatus.OK);
+		return new ResponseEntity<>(categoriaService.updateCategoria(categoria), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
@@ -93,9 +76,8 @@ public class CategoriaController {
 			@ApiResponse(responseCode = "404", description = "Falha. Não há uma categoria com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<String> deleteCategoriaById(@PathVariable Integer id) {
-		if (categoriaService.findCategoriaById(id) == null)
-			throw new NoSuchElementFoundException("Não foi encontrada categoria com o Id: " + id);
 		categoriaService.deleteCategoriaById(id);
+		
 		return new ResponseEntity<>("", HttpStatus.OK);
 	}
 
