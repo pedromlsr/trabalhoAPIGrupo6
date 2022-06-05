@@ -2,6 +2,8 @@ package org.serratec.ecommerce.controllers;
 
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
@@ -43,7 +45,7 @@ public class PedidoController {
 	}
 
 	@PostMapping
-	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
+	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) throws MessagingException {
 		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
 	}
 	

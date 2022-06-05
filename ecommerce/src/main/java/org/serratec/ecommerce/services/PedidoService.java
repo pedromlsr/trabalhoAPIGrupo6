@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
@@ -79,7 +81,7 @@ public class PedidoService {
 	}
 
 
-	public PedidoResDTO savePedido(PedidoReqDTO pedidoReqDTO) {
+	public PedidoResDTO savePedido(PedidoReqDTO pedidoReqDTO) throws MessagingException {
 		Pedido pedido = new Pedido();
 
 		pedido.setDataPedido(LocalDate.now());
@@ -91,7 +93,7 @@ public class PedidoService {
 
 		PedidoReqDTO novoPedidoReqDTO = itemPedidoService.salvarItemPedido(pedidoReqDTO);
 
-		emailService.enviarEmailTexto(novoPedidoReqDTO);
+		emailService.enviarEmailHtml(novoPedidoReqDTO);
 
 		PedidoResDTO pedidoResDTO = convertEntityToDTO(pedido);
 

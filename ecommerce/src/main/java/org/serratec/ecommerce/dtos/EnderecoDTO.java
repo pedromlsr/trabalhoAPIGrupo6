@@ -9,6 +9,11 @@ public class EnderecoDTO {
 	private String numero;
 	private String complemento;
 
+	@Override
+	public String toString() {
+		return rua + ", " + numero + " " + complemento + "<br>" + bairro + "<br>" + cidade + "<br>" + cep;
+	}
+	
 	public Integer getIdEndereco() {
 		return idEndereco;
 	}

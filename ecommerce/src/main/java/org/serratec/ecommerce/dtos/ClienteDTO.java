@@ -39,6 +39,11 @@ public class ClienteDTO {
 	
 	private Integer idEndereco;
 
+	@Override
+	public String toString() {
+		return nomeCompleto + "<br>" + cpf + "<br>" + telefone + "<br>" + email;
+	}
+
 	public Integer getIdCliente() {
 		return idCliente;
 	}

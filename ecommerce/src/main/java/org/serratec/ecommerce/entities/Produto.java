@@ -52,6 +52,12 @@ public class Produto {
 	@JoinColumn(name = "id_categoria", referencedColumnName = "id_categoria")
 	private Categoria categoria;
 
+	@Override
+	public String toString() {
+		return "<br>Nome: " + nomeProduto + "<br>Descrição: " + descricaoProduto + "<br>Valor: " + valorUnitario
+				+ "<hr>";
+	}
+
 	public Integer getIdProduto() {
 		return idProduto;
 	}
