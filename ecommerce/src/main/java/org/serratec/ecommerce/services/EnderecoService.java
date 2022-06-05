@@ -74,6 +74,10 @@ public class EnderecoService {
 		if (numero == null) {
 			numero = "s/n";
 		}
+		
+		if (complemento == null) {
+			complemento = "";
+		}
 
 		CadastroEnderecoDTO cadCepDTO = consultarEnderecoPorCep(limpezaCep);
 		Endereco endereco = cepDTOParaEndereco(cadCepDTO);

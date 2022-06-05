@@ -11,6 +11,7 @@ import org.serratec.ecommerce.exceptions.ClienteException;
 import org.serratec.ecommerce.exceptions.CpfException;
 import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.exceptions.EnderecoException;
+import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,24 +41,39 @@ public class ClienteService {
 	}
 
 	public ClienteDTO saveCliente(ClienteDTO clienteDTO) throws EnderecoException {
+
 		Boolean cpfExistente = clienteRepository.existsByCpf(clienteDTO.getCpf());
 		Boolean emailExistente = clienteRepository.existsByEmail(clienteDTO.getEmail());
 
-		if (cpfExistente == true) {
-			throw new CpfException("CPF já registrado.");
-		} else if (emailExistente == true) {
-			throw new EmailException("Email já registrado.");
-		} else if (!validate(clienteDTO.getEmail())) {
+		if (clienteDTO.getIdCliente() != null) {
+			Cliente clienteBD = clienteRepository.findById(clienteDTO.getIdCliente()).get();
+
+			if (cpfExistente == true && clienteDTO.getIdCliente() != clienteBD.getIdCliente()) {
+				throw new CpfException("CPF já registrado.");
+			} else if (emailExistente == true && clienteDTO.getIdCliente() != clienteBD.getIdCliente()) {
+				throw new EmailException("Email já registrado.");
+			}
+
+		} else {
+			if (cpfExistente == true) {
+				throw new CpfException("CPF já registrado.");
+			} else if (emailExistente == true) {
+				throw new EmailException("Email já registrado.");
+			}
+		}
+
+		if (!validate(clienteDTO.getEmail())) {
 			throw new EmailException("Email inválido.");
-		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
+		}
+		if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
 			throw new ClienteException("Nome com apenas letras.");
 		} else {
-			
-			Cliente novoCliente = clienteRepository.save(DTOParaEntidade(clienteDTO));			
-			enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(), clienteDTO.getNumero(), clienteDTO.getComplemento());
-			
-			
-			return EntidadeParaDTO(novoCliente);
+
+			Cliente novoCliente = clienteRepository.save(DTOParaEntidade(clienteDTO));
+			enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(), clienteDTO.getNumero(),
+					clienteDTO.getComplemento());
+
+			return EntidadeParaDTO(clienteRepository.save(novoCliente));
 		}
 	}
 
@@ -69,15 +85,27 @@ public class ClienteService {
 		return matcher.find();
 	}
 
-	public ClienteDTO updateCliente(ClienteDTO clienteDTO) throws CpfException, EmailException, ClienteException {
+	public ClienteDTO updateCliente(ClienteDTO clienteDTO)
+			throws CpfException, EmailException, ClienteException, EnderecoException {
+		
+		if (clienteDTO.getIdCliente() == null) {
+			throw new ClienteException("Não foi informado um ID");
+		}
+		Cliente clienteBD = clienteRepository.findById(clienteDTO.getIdCliente()).isPresent()
+				? clienteRepository.findById(clienteDTO.getIdCliente()).get()
+				: null;
 
+		if (clienteBD == null) {
+			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado");
+		}
 		if (!validate(clienteDTO.getEmail())) {
 			throw new EmailException("Email inválido.");
-		} else if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
-			throw new ClienteException("Nome com apenas letras.");
-		} else {
-			return EntidadeParaDTO(clienteRepository.save(DTOParaEntidade(clienteDTO)));
 		}
+		if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
+			throw new ClienteException("Nome com apenas letras.");
+		}
+
+		return saveCliente(clienteDTO);
 
 	}
 
@@ -94,8 +122,8 @@ public class ClienteService {
 		cliente.setCpf(clienteDTO.getCpf());
 		cliente.setTelefone(clienteDTO.getTelefone());
 		cliente.setDataNascimento(clienteDTO.getDataNascimento());
-		if(clienteDTO.getIdEndereco()!=null)
-		cliente.setEndereco(enderecoService.findEnderecoById(clienteDTO.getIdEndereco()));
+		if (clienteDTO.getIdEndereco() != null)
+			cliente.setEndereco(enderecoService.findEnderecoById(clienteDTO.getIdEndereco()));
 
 		return cliente;
 	}
