@@ -9,6 +9,7 @@ import org.serratec.ecommerce.dtos.ProdutoPostDTO;
 import org.serratec.ecommerce.entities.Categoria;
 import org.serratec.ecommerce.entities.Produto;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
+import org.serratec.ecommerce.exceptions.ProdutoException;
 import org.serratec.ecommerce.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,8 +88,7 @@ public class ProdutoService {
 	public ProdutoGetDTO updateProduto(ProdutoPostDTO produtoDto) {
 		
 		if (produtoDto.getIdProduto() == null) {
-			// Precisa trocar o tipo de Exception
-			throw new NoSuchElementFoundException("Não foi informado um ID");
+			throw new ProdutoException("Não foi informado um ID");
 		}
 		
 		Produto produtoBD= convertDtoToEntity(findProdutoByDescricaoDto(produtoDto));
@@ -147,7 +147,7 @@ public class ProdutoService {
 
 		Produto produtoBD = produtoRepository.findByDescricaoProdutoIgnoreCase(produtoDto.getDescricaoProduto());
 		if (produtoBD != null && produtoBD.getIdProduto() != produtoDto.getIdProduto()) {
-			throw new NoSuchElementFoundException(
+			throw new ProdutoException(
 					"O produto de id: " + produtoBD.getIdProduto() + " já possui essa descrição");
 		}
 
