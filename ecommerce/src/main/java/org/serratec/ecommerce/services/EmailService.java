@@ -93,7 +93,7 @@ public class EmailService {
 				"<p>Info:</p>" +
 				"<p>" + clienteService.findClienteById(pedidoReqDTO.getIdCliente()) + "</p><br>" +
 				"<p>Endereço:</p>" +
-				"<p>" + enderecoService.findEnderecoById(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getIdEndereco()) + "<p><br><hr>" +
+				"<p>" + enderecoService.findEnderecoById(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getEndereco().getIdEndereco()) + "<p><br><hr>" +
 				"<h3>Produtos:</h3><br>" + 
 				"<p>" + produtoEmail + "</p>" +
 				"<p><b>Total: R$ " + String.format("%.2f", pedidoReqDTO.getValorLiqTotal()) + "</b></p>";

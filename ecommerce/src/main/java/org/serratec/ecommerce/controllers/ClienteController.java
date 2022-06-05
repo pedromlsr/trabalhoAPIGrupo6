@@ -5,9 +5,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.serratec.ecommerce.dtos.ClienteDTO;
-import org.serratec.ecommerce.exceptions.ClienteException;
-import org.serratec.ecommerce.exceptions.CpfException;
-import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.exceptions.ErrorResponse;
 import org.serratec.ecommerce.services.ClienteService;
@@ -53,8 +50,8 @@ public class ClienteController {
 					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna a categoria desejada.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
 					@ApiResponse(responseCode = "404", description = "Falha. Não há um cliente cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
-	public ResponseEntity<ClienteDTO> findClienteById(@PathVariable Integer id) {
-		return new ResponseEntity<>(clienteService.findClienteById(id), HttpStatus.OK);
+	public ResponseEntity<ClienteDTO> findClienteByIdDTO(@PathVariable Integer id) {
+		return new ResponseEntity<>(clienteService.findClienteByIdDTO(id), HttpStatus.OK);
 	}
 
 	@PostMapping
@@ -71,7 +68,7 @@ public class ClienteController {
 			@ApiResponse(responseCode = "404", description = "Falha. Não há um cliente com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ClienteDTO> updateCliente(@Valid @RequestBody ClienteDTO clienteDTO)
-			throws CpfException, EmailException, ClienteException, EnderecoException {
+			throws EnderecoException {
 		return new ResponseEntity<>(clienteService.updateCliente(clienteDTO), HttpStatus.OK);
 	}
 

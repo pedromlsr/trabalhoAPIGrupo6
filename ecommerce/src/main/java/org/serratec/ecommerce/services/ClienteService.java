@@ -10,8 +10,6 @@ import org.serratec.ecommerce.entities.Cliente;
 import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.exceptions.ClienteException;
-import org.serratec.ecommerce.exceptions.CpfException;
-import org.serratec.ecommerce.exceptions.EmailException;
 import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
@@ -37,16 +35,26 @@ public class ClienteService {
 		List<Cliente> listClienteEntidade = clienteRepository.findAll();
 		List<ClienteDTO> listClienteDTO = new ArrayList<ClienteDTO>();
 
+		if (listClienteEntidade.isEmpty()) {
+			throw new NoSuchElementFoundException("Nenhum cliente encontrado.");
+		}
+
 		for (Cliente cliente : listClienteEntidade) {
 			listClienteDTO.add(EntidadeParaDTO(cliente));
 		}
 		return listClienteDTO;
 	}
 
-	public ClienteDTO findClienteById(Integer idCliente) {
-		return clienteRepository.findById(idCliente).isPresent()
-				? EntidadeParaDTO(clienteRepository.findById(idCliente).get())
-				: null;
+	public Cliente findClienteById(Integer idCliente) {
+		return clienteRepository.findById(idCliente).isPresent() ? clienteRepository.findById(idCliente).get() : null;
+	}
+
+	public ClienteDTO findClienteByIdDTO(Integer idCliente) {
+		if (!clienteRepository.existsById(idCliente)) {
+			throw new NoSuchElementFoundException("O cliente de Id = " + idCliente + " não foi encontrado.");
+		}
+
+		return EntidadeParaDTO(clienteRepository.findById(idCliente).get());
 	}
 
 	public ClienteDTO saveCliente(ClienteDTO clienteDTO) throws EnderecoException {
@@ -57,22 +65,22 @@ public class ClienteService {
 		if (clienteDTO.getIdCliente() != null) {
 
 			if (clienteCpfExistente != null && clienteDTO.getIdCliente() != clienteCpfExistente.getIdCliente()) {
-				throw new CpfException("CPF já registrado.");
+				throw new ClienteException("CPF já registrado.");
 			} else if (clienteEmailExistente != null
 					&& clienteDTO.getIdCliente() != clienteEmailExistente.getIdCliente()) {
-				throw new EmailException("Email já registrado.");
+				throw new ClienteException("Email já registrado.");
 			}
 
 		} else {
 			if (clienteCpfExistente != null) {
-				throw new CpfException("CPF já registrado.");
+				throw new ClienteException("CPF já registrado.");
 			} else if (clienteEmailExistente != null) {
-				throw new EmailException("Email já registrado.");
+				throw new ClienteException("Email já registrado.");
 			}
 		}
 
 		if (!validate(clienteDTO.getEmail())) {
-			throw new EmailException("Email inválido.");
+			throw new ClienteException("Email inválido.");
 		}
 		if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
 			throw new ClienteException("Nome com apenas letras.");
@@ -95,8 +103,7 @@ public class ClienteService {
 		return matcher.find();
 	}
 
-	public ClienteDTO updateCliente(ClienteDTO clienteDTO)
-			throws CpfException, EmailException, ClienteException, EnderecoException {
+	public ClienteDTO updateCliente(ClienteDTO clienteDTO) throws EnderecoException {
 
 		if (clienteDTO.getIdCliente() == null) {
 			throw new ClienteException("Não foi informado um ID");
@@ -106,7 +113,7 @@ public class ClienteService {
 				: null;
 
 		if (clienteBD == null) {
-			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado");
+			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado.");
 		}
 
 		return saveCliente(clienteDTO);
@@ -116,7 +123,7 @@ public class ClienteService {
 	public void deleteClienteById(Integer idCliente) {
 
 		if (!clienteRepository.findById(idCliente).isPresent()) {
-			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado");
+			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado.");
 		}
 
 		Cliente clienteBD = clienteRepository.findById(idCliente).get();
