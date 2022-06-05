@@ -8,7 +8,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
-import org.serratec.ecommerce.entities.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -74,14 +73,20 @@ public class EmailService {
 	}
 
 	private String montarCorpoEmail(PedidoReqDTO pedidoReqDTO) {
-		List<String> listaProdutos = new ArrayList<>();
+//		List<String> listaNomeProduto = new ArrayList<>();
+//		List<String> listaDescProduto = new ArrayList<>();
+//		List<Integer> listaQuantProduto = new ArrayList<>();
+		
+		String produtoEmail = "";
 		
 		for (ItemPedido itemPedido : pedidoReqDTO.getItemPedidoList()) {
-			listaProdutos.add(itemPedido.getProduto().getNomeProduto());
+//			listaNomeProduto.add(itemPedido.getProduto().getNomeProduto());
+//			listaDescProduto.add(itemPedido.getProduto().getDescricaoProduto());
+//			listaQuantProduto.add(itemPedido.getQuantidade());
+
+			produtoEmail += "> " + itemPedido.getProduto().getNomeProduto() + " --- x" + itemPedido.getQuantidade() + " --- R$ " + String.format("%.2f", itemPedido.getValorLiquido()) + "<br>";
 		}
 		
-		String produtoEmail =
-				"";
 		
 		String corpoEmail =
 				"<h3>Olá, " + clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getNomeCompleto() + "!</h3><br>" +
@@ -92,8 +97,9 @@ public class EmailService {
 				"<p>" + clienteService.findClienteById(pedidoReqDTO.getIdCliente()) + "</p><br>" +
 				"<p>Endereço:</p>" +
 				"<p>" + enderecoService.findEnderecoById(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getIdEndereco()) + "<p><br><hr>" +
-				"<h3>Produtos:</h3><br>" +
-				listaProdutos;
+				"<h3>Produtos:</h3><br>" + 
+				"<p>" + produtoEmail + "</p>" +
+				"<p><b>Total: R$ " + String.format("%.2f", pedidoReqDTO.getValorLiqTotal()) + "</b></p>";
 
 		return corpoEmail;
 	}
