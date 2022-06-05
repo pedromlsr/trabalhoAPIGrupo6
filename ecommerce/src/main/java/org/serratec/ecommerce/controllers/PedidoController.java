@@ -6,6 +6,7 @@ import javax.mail.MessagingException;
 
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
+import org.serratec.ecommerce.exceptions.ErrorResponse;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.services.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/pedido")
+@Tag(name = "Pedido")
 public class PedidoController {
 	@Autowired
 	PedidoService pedidoService;
 
 	@GetMapping
+	@Operation(summary = "Busca todos os pedidos cadastrados no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os pedidos cadastrados no sistema.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PedidoResDTO.class)))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum pedido encontrado no sistema.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<List<PedidoResDTO>> findAllPedido() {
 		if (pedidoService.findAllPedido() == null) {
 			throw new NoSuchElementFoundException("Nenhum pedido encontrado.");
@@ -36,6 +50,11 @@ public class PedidoController {
 	}
 
 	@GetMapping("/{id}")
+	@Operation(summary = "Busca um pedido cadastrado no sistema através do seu ID.", parameters = {
+			@Parameter(name = "id", description = "ID do pedido desejado.") }, responses = {
+					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o pedido que possui o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
+					@ApiResponse(responseCode = "404", description = "Falha. Não há um pedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<PedidoResDTO> findPedidoByIdDTO(@PathVariable Integer id) {
 		if (pedidoService.findPedidoByIdDTO(id) == null) {
 			throw new NoSuchElementFoundException("O Pedido de id = " + id + " não foi encontrado.");
@@ -45,39 +64,66 @@ public class PedidoController {
 	}
 
 	@PostMapping
+	@Operation(summary = "Cadastra um novo pedido no sistema e retorna seus dados.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra o pedido no sistema e retorna seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) throws MessagingException {
 		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
 	}
-	
+
 	@PutMapping
-	public ResponseEntity<PedidoResDTO> updatePedido( @RequestBody PedidoReqDTO pedidoReqDTO) {
+	@Operation(summary = "Atualiza um pedido cadastrado no sistema enquanto estiver em status de aguardando pagamento e retorna seus dados atualizados.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o pedido que possui o ID fornecido e retorna seus dados atualizados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Esta requisição só pode ser realizada enquanto o pedido estiver em status de 'Aguardando pagamento'.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Não há um pedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
+	public ResponseEntity<PedidoResDTO> updatePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
 		if (pedidoService.findPedidoByIdDTO(pedidoReqDTO.getIdPedido()) == null) {
-			throw new NoSuchElementFoundException(
-					"Não foi possível atualizar. O Pedido de id = " + pedidoReqDTO.getIdPedido() + " não foi encontrado.");
-		}		
-		
+			throw new NoSuchElementFoundException("Não foi possível atualizar. O Pedido de id = "
+					+ pedidoReqDTO.getIdPedido() + " não foi encontrado.");
+		}
+		if (pedidoService.findPedidoByIdDTO(pedidoReqDTO.getIdPedido()).getDescricaoStatus() != "Aguardando pagamento") {
+			//Criar exception customizada
+			throw new NoSuchElementFoundException("Esta requisição só pode ser realizada enquanto o pedido estiver em status de 'Aguardando pagamento'.");
+		}
+
 		return new ResponseEntity<>(pedidoService.updatePedido(pedidoReqDTO), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/{idPedido}/{idStatus}")
-	public ResponseEntity<PedidoResDTO> updatePedidoStatus(@PathVariable Integer idPedido, @PathVariable Integer idStatus) {
+	@Operation(summary = "Atualiza o status de um pedido cadastrado no sistema e retorna seus dados atualizados.", parameters = {
+			@Parameter(name = "idPedido", description = "ID do pedido desejado."),
+			@Parameter(name = "idStatus", description = "ID do status para o qual será alterado.")}, responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o status do pedido desejado e retorna seus dados atualizados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. [Esta requisição só pode ser realizada para os status de id 2 e 3 ( Enviado e Entregue). | Não é possível definir como entregue um pedido que ainda não foi enviado. ]", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Não há um pedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
+	public ResponseEntity<PedidoResDTO> updatePedidoStatus(@PathVariable Integer idPedido,
+			@PathVariable Integer idStatus) {
 		if (pedidoService.findPedidoByIdDTO(idPedido) == null) {
 			throw new NoSuchElementFoundException(
 					"Não foi possível atualizar. O Pedido de id = " + idPedido + " não foi encontrado.");
 		}
 		if (idStatus != 2 && idStatus != 3) {
 			// Criar exception customizada
-			throw new NoSuchElementFoundException("Esta requisição só pode ser efetuada para os status de id 2 e 3 (Enviado e Entregue).");
+			throw new NoSuchElementFoundException(
+					"Esta requisição só pode ser realizada para os status de id 2 e 3 (Enviado e Entregue).");
 		}
 		if (idStatus == 3 && (pedidoService.findPedidoByIdDTO(idPedido).getDataEnvio() == null)) {
 			// Criar exception customizada
-			throw new NoSuchElementFoundException("Não é possível definir como entregue um pedido que ainda não foi enviado.");
+			throw new NoSuchElementFoundException(
+					"Não é possível definir como entregue um pedido que ainda não foi enviado.");
 		}
 
 		return new ResponseEntity<>(pedidoService.updatePedidoStatus(idPedido, idStatus), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
+	@Operation(summary = "Exclui um pedido cadastrado no sistema através do seu ID.", parameters = {
+			@Parameter(name = "id", description = "ID do pedido desejado.") }, responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui o pedido que possui o ID fornecido.", content = @Content),
+			@ApiResponse(responseCode = "404", description = "Falha. Não há um pedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<String> deletePedidoById(@PathVariable Integer id) {
 		if (pedidoService.findPedidoByIdDTO(id) == null) {
 			throw new NoSuchElementFoundException(

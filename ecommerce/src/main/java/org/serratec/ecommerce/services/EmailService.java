@@ -1,8 +1,5 @@
 package org.serratec.ecommerce.services;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
