@@ -20,9 +20,16 @@ public class ProdutoPostDTO {
 	
 	@NotNull(message="O valor do produto não pode estar em branco")
 	private Double valorUnitario;
-		
-	//private CategoriaDTO idCategoria;
 	
+	@NotNull(message="Deve ser informada uma categoria através do seu ID")
+	private Integer idCategoria;
+	
+	public Integer getIdCategoria() {
+		return idCategoria;
+	}
+	public void setIdCategoria(Integer idCategoria) {
+		this.idCategoria = idCategoria;
+	}
 	public Integer getIdProduto() {
 		return idProduto;
 	}

@@ -88,7 +88,7 @@ public class ClienteService {
 		cliente.setCpf(clienteDTO.getCpf());
 		cliente.setTelefone(clienteDTO.getTelefone());
 		cliente.setDataNascimento(clienteDTO.getDataNascimento());
-		cliente.setEndereco(enderecoService.findEnderecoById(clienteDTO.getIdEndereco()));
+		//cliente.setEndereco(enderecoService.findEnderecoById(clienteDTO.getIdEndereco()));
 
 		return cliente;
 	}
