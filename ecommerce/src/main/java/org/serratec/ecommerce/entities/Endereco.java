@@ -48,6 +48,11 @@ public class Endereco {
 	@JsonIgnore
 	private List<Cliente> clienteList;
 
+	@Override
+	public String toString() {
+		return rua + ", " + numero + " " + complemento + "<br>" + bairro + "<br>" + cidade + " - " + uf + "<br>" + cep;
+	}
+	
 	public Integer getIdEndereco() {
 		return idEndereco;
 	}
