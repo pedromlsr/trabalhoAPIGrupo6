@@ -29,18 +29,18 @@ public class ItemPedidoController {
 	ItemPedidoService itemPedidoService;
 
 	@GetMapping
-	@Operation(summary = "Busca todas as relações item-pedido cadastradas.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os item-pedido cadastrados.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ItemPedidoDTO.class)))),
-			@ApiResponse(responseCode = "404", description = "Falha. Nenhum item-pedido encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+	@Operation(summary = "Busca todos os ItemPedido cadastrados no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os ItemPedido cadastrados no sistema.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ItemPedidoDTO.class)))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum ItemPedido encontrado no sistema.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<List<ItemPedidoDTO>> findAllItemPedidoDTO() {
 		return new ResponseEntity<>(itemPedidoService.findAllItemPedidoDTO(), HttpStatus.OK);
 	}
 
-	@Operation(summary = "Busca um itemPedido cadastrado no sistema através do seu ID.", parameters = {
-			@Parameter(name = "id", description = "ID do itemPedido desejado.") }, responses = {
-					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o itemPedido que possui o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ItemPedidoDTO.class))),
-					@ApiResponse(responseCode = "404", description = "Falha. Não há um itemPedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+	@Operation(summary = "Busca um ItemPedido cadastrado no sistema através do seu id.", parameters = {
+			@Parameter(name = "id", description = "Id do itemPedido desejado.") }, responses = {
+					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o ItemPedido que possui o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ItemPedidoDTO.class))),
+					@ApiResponse(responseCode = "404", description = "Falha. Nenhum ItemPedido encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	@GetMapping("/{id}")
 	public ResponseEntity<ItemPedidoDTO> findItemPedidoByIdDTO(@PathVariable Integer id) {

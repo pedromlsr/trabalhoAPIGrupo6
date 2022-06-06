@@ -19,7 +19,7 @@ public class CategoriaService {
 		List<Categoria> categoriaList = new ArrayList<Categoria>();
 		categoriaList = categoriaRepository.findAll();
 		if (categoriaList.isEmpty()) {
-			throw new NoSuchElementFoundException("Não foi encontrada nenhuma categoria");
+			throw new NoSuchElementFoundException("Nenhuma categoria encontrada.");
 		}
 
 		return categoriaList;
@@ -27,7 +27,7 @@ public class CategoriaService {
 
 	public Categoria findCategoriaById(Integer id) {
 		if (!categoriaRepository.findById(id).isPresent()) {
-			throw new NoSuchElementFoundException("Não foi encontrada categoria com o Id: " + id);
+			throw new NoSuchElementFoundException("A categoria de id = " + id + " não foi encontrada.");
 		}
 
 		return categoriaRepository.findById(id).get();
@@ -41,7 +41,7 @@ public class CategoriaService {
 	public Categoria saveCategoria(Categoria categoria) {
 
 		if (findCategoriaByNome(categoria) != null)
-			throw new CategoriaException("Já possui uma categoria cadastrada com esse nome.");
+			throw new CategoriaException("A categoria de id = " + findCategoriaByNome(categoria).getIdCategoria() + " já possui o nome informado.");
 
 		return categoriaRepository.save(categoria);
 	}
@@ -49,13 +49,13 @@ public class CategoriaService {
 	public Categoria updateCategoria(Categoria categoria) {
 
 		if (categoria.getIdCategoria() == null) {
-			throw new CategoriaException("Não foi informado um ID");
+			throw new CategoriaException("Não foi informado um id para a categoria");
 		}
 
 		Categoria categoriaAtualizada = findCategoriaById(categoria.getIdCategoria());
 		if (categoriaAtualizada == null) {
 			throw new NoSuchElementFoundException(
-					"Não foi encontrada categoria com o Id: " + categoria.getIdCategoria());
+					"Não foi encontrada categoria com o id= " + categoria.getIdCategoria());
 		}
 
 		Categoria categoriaBD = findCategoriaByNome(categoria);
@@ -64,7 +64,7 @@ public class CategoriaService {
 
 			if (categoriaAtualizada.getIdCategoria() != categoriaBD.getIdCategoria()) {
 				throw new CategoriaException(
-						"A categoria de ID: " + categoriaBD.getIdCategoria() + " já possui esse nome.");
+						"A categoria de id = " + categoriaBD.getIdCategoria() + " já possui o nome informado.");
 			}
 		}
 		return categoriaRepository.save(categoria);
@@ -73,7 +73,7 @@ public class CategoriaService {
 	public void deleteCategoriaById(Integer id) {
 		Categoria categoriaAtualizada = findCategoriaById(id);
 		if (categoriaAtualizada == null)
-			throw new NoSuchElementFoundException("Não foi encontrada categoria com o Id: " + id);
+			throw new NoSuchElementFoundException("A categoria com o id = " + id + "não foi encontrada");
 
 		categoriaRepository.deleteById(id);
 	}

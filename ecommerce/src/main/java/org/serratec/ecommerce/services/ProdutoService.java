@@ -35,7 +35,7 @@ public class ProdutoService {
 			listProdutoDto.add(convertEntityToDto(produto));
 		}
 		if (listProduto.isEmpty()) {
-			throw new NoSuchElementFoundException("Não foi encontrado nenhum produto");
+			throw new NoSuchElementFoundException("Nenhum produto encontrado");
 		}
 
 		return listProdutoDto;
@@ -43,14 +43,14 @@ public class ProdutoService {
 
 	public Produto findProdutoById(Integer id) {
 		if (!produtoRepository.findById(id).isPresent()) {
-			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
+			throw new NoSuchElementFoundException("O produto de id =" + id + " não foi encontrado");
 		}
 		return produtoRepository.findById(id).get();
 	}
 
 	public ProdutoGetDTO findProdutoByIdDTO(Integer id) {
 		if (!produtoRepository.findById(id).isPresent()) {
-			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
+			throw new NoSuchElementFoundException("O produto de id = " + id + " não foi encontrado");
 		}
 
 		return convertEntityToDto(produtoRepository.findById(id).get());
@@ -88,7 +88,7 @@ public class ProdutoService {
 	public ProdutoGetDTO updateProduto(ProdutoPostDTO produtoDto) {
 		
 		if (produtoDto.getIdProduto() == null) {
-			throw new ProdutoException("Não foi informado um ID");
+			throw new ProdutoException("Não foi informado um id para o produto");
 		}
 		
 		Produto produtoBD= convertDtoToEntity(findProdutoByDescricaoDto(produtoDto));
@@ -103,7 +103,7 @@ public class ProdutoService {
 
 	public void deleteProdutoById(Integer id) {
 		if (findProdutoByIdDTO(id) == null) {
-			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);
+			throw new NoSuchElementFoundException("O produto de id = " + id + " não foi encontrado");
 		}
 		produtoRepository.deleteById(id);
 	}
@@ -141,7 +141,7 @@ public class ProdutoService {
 		Produto produtoBD = produtoRepository.findByDescricaoProdutoIgnoreCase(produtoDto.getDescricaoProduto());
 		if (produtoBD != null && produtoBD.getIdProduto() != produtoDto.getIdProduto()) {
 			throw new ProdutoException(
-					"O produto de id: " + produtoBD.getIdProduto() + " já possui essa descrição");
+					"O produto de id = " + produtoBD.getIdProduto() + " já possui essa descrição");
 		}
 
 		return produtoDto;
@@ -151,7 +151,7 @@ public class ProdutoService {
 		Categoria categoria = categoriaService.findCategoriaById(produtoDto.getIdCategoria());
 		if (categoria == null) {
 			throw new NoSuchElementFoundException(
-					"Não foi encontrada uma categoria para o Id: " + produtoDto.getIdCategoria());
+					"A categoria de id = " + produtoDto.getIdCategoria() + "não foi encontrada" );
 		}
 
 	}

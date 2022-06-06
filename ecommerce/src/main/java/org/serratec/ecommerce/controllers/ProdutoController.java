@@ -40,27 +40,28 @@ public class ProdutoController {
 	ProdutoService produtoService;
 
 	@GetMapping
-	@Operation(summary = "Busca todos os produtos cadastrados.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os produtos cadastrados.", content = 	@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProdutoGetDTO.class)))),
-			@ApiResponse(responseCode = "404", description = "Falha. Nenhum produto encontrado.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+	@Operation(summary = "Busca todos os produtos cadastrados no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os produtos cadastrados no sistema.", content = 	@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProdutoGetDTO.class)))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum produto encontrado no sistema.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<List<ProdutoGetDTO>> findAllProduto() {
 		return new ResponseEntity<>(produtoService.findAllProduto(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	@Operation(summary = "Busca um produto cadastrado através do seu ID.", parameters = {
+	@Operation(summary = "Busca um produto cadastrado no sistema através do seu id.", parameters = {
 		@Parameter(name = "id", description = "Id do produto desejado.") }, responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o produto desejado.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o produto que possui o id fornecido.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum produto encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> findProdutoByIdDTO(@PathVariable Integer id) {
 		return new ResponseEntity<>(produtoService.findProdutoByIdDTO(id), HttpStatus.OK);
 	}
 
 	@PostMapping
-	@Operation(summary = "Cadastra um novo produto.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo produto.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+	@Operation(summary = "Cadastra um novo produto no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo produto no sistema e retorna seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> saveProdutoDTO(@Valid @RequestBody ProdutoPostDTO produtoDto) {
 		return new ResponseEntity<>(produtoService.saveProdutoDTO(produtoDto), HttpStatus.CREATED);
@@ -68,31 +69,33 @@ public class ProdutoController {
 
 	@PostMapping(value = "/com-foto", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.MULTIPART_FORM_DATA_VALUE })
-	@Operation(summary = "Cadastra um novo produto com uma foto.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo produto com foto.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+	@Operation(summary = "Cadastra um novo Produto com uma foto.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo produto com foto no sistema e retorna seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> saveProdutoDtoComFoto(@Valid @RequestPart("produto") ProdutoPostDTO produtoDto, @RequestPart("file") MultipartFile file) throws Exception {
 		return new ResponseEntity<>(produtoService.saveProdutoDtoComFoto(produtoDto, file), HttpStatus.CREATED);
 	}
 
 	@PutMapping
-	@Operation(summary = "Atualiza um produto cadastrado.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o produto desejado.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+	@Operation(summary = "Atualiza um produto cadastrado no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o produto que possui o id fornecido e retorna os seus dados.", content = 	@Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum produto encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> updateProduto(@Valid @RequestBody ProdutoPostDTO produtoDto) {
 		return new ResponseEntity<>(produtoService.updateProduto(produtoDto), HttpStatus.OK);
 	}	
 
 	@DeleteMapping("/{id}")
-	@Operation(summary = "Exclui um produto cadastrado através do seu ID.", parameters = {
+	@Operation(summary = "Exclui um produto cadastrado através do seu id.", parameters = {
 	@Parameter(name = "id", description = "Id do produto desejado.") }, responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui o produto desejado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui o produto que possui o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum produto encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<String> deleteProdutoById(@PathVariable Integer id) {
 		produtoService.deleteProdutoById(id);
-		return new ResponseEntity<>("O Produto de id = " + id + " foi excluído com sucesso.",HttpStatus.OK);
+		return new ResponseEntity<>("O produto de id = " + id + " foi excluído com sucesso.",HttpStatus.OK);
 	}
 
 }

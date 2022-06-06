@@ -35,27 +35,28 @@ public class CategoriaController {
 	CategoriaService categoriaService;
 
 	@GetMapping
-	@Operation(summary = "Busca todas as categorias cadastradas.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todas as categorias cadastradas.", content = @Content(mediaType = "application/json",  array = @ArraySchema(schema = @Schema(implementation = Categoria.class)))),
-			@ApiResponse(responseCode = "404", description = "Falha. Nenhuma categoria encontrada.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+	@Operation(summary = "Busca todas as Categorias cadastradas no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todas as categorias cadastradas no sistema.", content = @Content(mediaType = "application/json",  array = @ArraySchema(schema = @Schema(implementation = Categoria.class)))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhuma categoria encontrada no sistema.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<List<Categoria>> findAllCategoria() {
 		return new ResponseEntity<>(categoriaService.findAllCategoria(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	@Operation(summary = "Busca uma categoria cadastrada através do seu ID.", parameters = {
+	@Operation(summary = "Busca uma categoria cadastrada através do seu id.", parameters = {
 			@Parameter(name = "id", description = "Id da categoria desejada.") }, responses = {
 					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna a categoria desejada.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Categoria.class))),
-					@ApiResponse(responseCode = "404", description = "Falha. Não há uma categoria cadastrada com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode = "404", description = "Falha. Não há uma categoria cadastrada com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<Categoria> findCategoriaById(@PathVariable Integer id) {
 		return new ResponseEntity<>(categoriaService.findCategoriaById(id), HttpStatus.OK);
 	}
 
 	@PostMapping
-	@Operation(summary = "Cadastra uma nova categoria.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra uma nova categoria.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Categoria.class))),
+	@Operation(summary = "Cadastra uma nova categoria no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra uma nova categoria no sistema e retorna seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Categoria.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<Categoria> saveCategoria(@Valid @RequestBody Categoria categoria) {
 		return new ResponseEntity<>(categoriaService.saveCategoria(categoria), HttpStatus.CREATED);
@@ -63,22 +64,23 @@ public class CategoriaController {
 
 	@PutMapping
 	@Operation(summary = "Atualiza uma categoria cadastrada.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza a categoria desejada.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Categoria.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há uma categoria com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza a categoria que possui o id fornecido e retorna os seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Categoria.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhuma categoria encontrada no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<Categoria> updateCategoria(@Valid @RequestBody Categoria categoria) {
 		return new ResponseEntity<>(categoriaService.updateCategoria(categoria), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
-	@Operation(summary = "Exclui uma categoria cadastrada através do seu ID.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui a categoria desejada.", content = @Content),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há uma categoria com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+	@Operation(summary = "Exclui uma categoria cadastrada através do seu id.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui a categoria que possui o id fornecido.", content = @Content),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhuma categoria encontrada no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<String> deleteCategoriaById(@PathVariable Integer id) {
 		categoriaService.deleteCategoriaById(id);
 		
-		return new ResponseEntity<>("A Categoria de id = " + id + " foi excluída com sucesso.", HttpStatus.OK);
+		return new ResponseEntity<>("A categoria de id = " + id + " foi excluída com sucesso.", HttpStatus.OK);
 	}
 
 }

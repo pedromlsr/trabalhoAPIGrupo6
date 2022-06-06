@@ -27,7 +27,7 @@ public class EnderecoService {
 
 	public List<EnderecoDTO> findAllEndereco() {
 		if (enderecoRepository.findAll().isEmpty()) {
-			throw new NoSuchElementFoundException("Não foi encontrado nenhum endereço");
+			throw new NoSuchElementFoundException("Nenhum endereço encontrado");
 		} else {
 			List<EnderecoDTO> enderecoDTOList = new ArrayList<>();
 
@@ -43,7 +43,7 @@ public class EnderecoService {
 			return enderecoRepository.findById(idEndereco).isPresent() ? enderecoRepository.findById(idEndereco).get()
 					: null;
 		} else {
-			throw new NoSuchElementFoundException("Endereço de id " + idEndereco + " não foi encontrado.");
+			throw new NoSuchElementFoundException("O endereço de id = " + idEndereco + " não foi encontrado.");
 		}
 	}
 
@@ -53,7 +53,7 @@ public class EnderecoService {
 					? EntidadeParaDTO(enderecoRepository.findById(idEndereco).get())
 					: null;
 		} else {
-			throw new NoSuchElementFoundException("Endereço de id " + idEndereco + " não foi encontrado.");
+			throw new NoSuchElementFoundException("O endereço de id = " + idEndereco + " não foi encontrado.");
 		}
 	}
 
@@ -62,11 +62,11 @@ public class EnderecoService {
 
 		if (!clienteRepository.findById(idCliente).isPresent()) {
 			throw new NoSuchElementFoundException(
-					"Cliente com id " + idCliente + " não foi encontrado para cadastro do endereço");
+					"O cliente de id = " + idCliente + " não foi encontrado");
 		}
 
 		if (limpezaCep.length() != 8) {
-			throw new EnderecoException("CEP inválido. CEP deve conter 8 números");
+			throw new EnderecoException("O CEP informado é inválido. O CEP deve conter 8 números");
 		}
 
 		if (numero == null) {
@@ -94,14 +94,14 @@ public class EnderecoService {
 
 	public EnderecoDTO updateEnderecoDTO(Integer idEndereco, EnderecoDTO enderecoDTO) {
 		if (!enderecoRepository.findById(idEndereco).isPresent()) {
-			throw new NoSuchElementFoundException("Endereço com id " + idEndereco + " não foi encontrado");
+			throw new NoSuchElementFoundException("O endereço com id =" + idEndereco + " não foi encontrado");
 		}
 
 		enderecoDTO.setIdEndereco(idEndereco);
 		String limpezaCep = enderecoDTO.getCep().replaceAll("[.-]", "");
 
 		if (limpezaCep.length() != 8) {
-			throw new EnderecoException("CEP inválido. CEP deve conter 8 números");
+			throw new EnderecoException("O CEP informado é inválido. O CEP deve conter 8 números");
 		}
 
 		return EntidadeParaDTO(enderecoRepository.save(DTOParaEntidade(enderecoDTO)));
@@ -117,7 +117,7 @@ public class EnderecoService {
 
 		}
 		if (!enderecoRepository.findById(idEndereco).isPresent()) {
-			throw new NoSuchElementFoundException("Endereço com id " + idEndereco + " não foi encontrado");
+			throw new NoSuchElementFoundException("O endereço com id =" + idEndereco + " não foi encontrado");
 		} else if (!listaIdEnderecosCadastrados.isEmpty()) {
 			throw new EnderecoException(
 					"Não foi possível excluir esse endereço, existem clientes com esse endereço cadastrado");

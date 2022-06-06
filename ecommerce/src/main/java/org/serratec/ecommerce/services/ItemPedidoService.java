@@ -60,14 +60,15 @@ public class ItemPedidoService {
 			itemPedido.setPedido(pedidoRepository.findById(pedidoReqDTO.getIdPedido()).get());
 
 			if (produtoService.findProdutoById(idProdutoItemPedido) == null) {
-				throw new NoSuchElementFoundException("Não foi encontrado um produto com o Id: " + idProdutoItemPedido);
+				throw new NoSuchElementFoundException(
+						"O produto de id = " + idProdutoItemPedido + "não foi encontrado");
 			}
 
 			itemPedido.setProduto(produtoService.findProdutoById(itemPedido.getProduto().getIdProduto()));
 
 			if (itemPedido.getProduto().getQtdEstoque() < itemPedido.getQuantidade()) {
-				throw new ItemPedidoException(
-						" Não há quantidade suficiente no estoque para satisfazer o pedido ");
+				throw new ItemPedidoException(" O estoque do Produto de id = " + idProdutoItemPedido
+						+ " não possui quantidade suficiente para este pedido");
 			}
 			itemPedido.getProduto().setQtdEstoque(itemPedido.getProduto().getQtdEstoque() - itemPedido.getQuantidade());
 			itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
