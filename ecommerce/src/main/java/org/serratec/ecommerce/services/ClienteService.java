@@ -6,7 +6,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.serratec.ecommerce.dtos.ClienteDTO;
+import org.serratec.ecommerce.dtos.EnderecoDTO;
 import org.serratec.ecommerce.entities.Cliente;
+import org.serratec.ecommerce.entities.Endereco;
 import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.exceptions.ClienteException;
@@ -87,10 +89,13 @@ public class ClienteService {
 		} else {
 
 			Cliente novoCliente = clienteRepository.save(DTOParaEntidade(clienteDTO));
-			enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(), clienteDTO.getNumero(),
-					clienteDTO.getComplemento());
+			EnderecoDTO endereco = enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(),
+					clienteDTO.getNumero(), clienteDTO.getComplemento());
 
-			return EntidadeParaDTO(clienteRepository.save(novoCliente));
+			clienteDTO = EntidadeParaDTO(clienteRepository.save(novoCliente));
+			clienteDTO.setIdEndereco(endereco.getIdEndereco());
+
+			return clienteDTO;
 		}
 
 	}
@@ -116,7 +121,11 @@ public class ClienteService {
 			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado.");
 		}
 
-		return saveCliente(clienteDTO);
+		Endereco endereco = clienteBD.getEndereco();
+		ClienteDTO novoClienteDTO = saveCliente(clienteDTO);
+		enderecoService.deleteByIdEndereco(endereco.getIdEndereco());
+
+		return novoClienteDTO;
 
 	}
 
@@ -137,7 +146,9 @@ public class ClienteService {
 			pedidoRepository.deleteById(pedido.getIdPedido());
 		}
 
+		Endereco endereco = clienteBD.getEndereco();
 		clienteRepository.deleteById(idCliente);
+		enderecoService.deleteByIdEndereco(endereco.getIdEndereco());
 	}
 
 	private Cliente DTOParaEntidade(ClienteDTO clienteDTO) {

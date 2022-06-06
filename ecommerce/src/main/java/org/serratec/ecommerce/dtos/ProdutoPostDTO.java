@@ -19,6 +19,7 @@ public class ProdutoPostDTO {
 	private Integer qtdEstoque;	
 	
 	@NotNull(message="O valor do produto não pode estar em branco")
+	@Min(value=0,message="O valor do produto deve ser igual ou maior do que 0")
 	private Double valorUnitario;
 	
 	@NotNull(message="Deve ser informada uma categoria através do seu ID")
