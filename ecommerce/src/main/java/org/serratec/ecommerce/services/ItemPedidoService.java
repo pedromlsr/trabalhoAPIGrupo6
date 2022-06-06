@@ -6,6 +6,7 @@ import java.util.List;
 import org.serratec.ecommerce.dtos.ItemPedidoDTO;
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
+import org.serratec.ecommerce.exceptions.ItemPedidoException;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ItemPedidoRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
@@ -33,7 +34,7 @@ public class ItemPedidoService {
 		}
 
 		List<ItemPedidoDTO> listItemPedidoDTO = new ArrayList<>();
-		
+
 		for (ItemPedido itemPedido : itemPedidoRepository.findAll()) {
 
 			listItemPedidoDTO.add(convertEntityToDto(itemPedido));
@@ -41,12 +42,12 @@ public class ItemPedidoService {
 
 		return listItemPedidoDTO;
 	}
-	
+
 	public ItemPedidoDTO findItemPedidoByIdDTO(Integer id) {
-		if(!itemPedidoRepository.existsById(id)) {
+		if (!itemPedidoRepository.existsById(id)) {
 			throw new NoSuchElementFoundException("O ItemPedido de id = " + id + " não foi encontrado.");
 		}
-		
+
 		return convertEntityToDto(itemPedidoRepository.findById(id).get());
 	}
 
@@ -55,7 +56,7 @@ public class ItemPedidoService {
 		for (ItemPedido itemPedido : pedidoReqDTO.getItemPedidoList()) {
 
 			Integer idProdutoItemPedido = itemPedido.getProduto().getIdProduto();
-			
+
 			itemPedido.setPedido(pedidoRepository.findById(pedidoReqDTO.getIdPedido()).get());
 
 			if (produtoService.findProdutoById(idProdutoItemPedido) == null) {
@@ -64,6 +65,11 @@ public class ItemPedidoService {
 
 			itemPedido.setProduto(produtoService.findProdutoById(itemPedido.getProduto().getIdProduto()));
 
+			if (itemPedido.getProduto().getQtdEstoque() < itemPedido.getQuantidade()) {
+				throw new ItemPedidoException(
+						" Não há quantidade suficiente no estoque para satisfazer o pedido ");
+			}
+			itemPedido.getProduto().setQtdEstoque(itemPedido.getProduto().getQtdEstoque() - itemPedido.getQuantidade());
 			itemPedido.setValorBruto(itemPedido.getPrecoVenda() * itemPedido.getQuantidade());
 			itemPedido.setValorLiquido(
 					itemPedido.getValorBruto() - (itemPedido.getValorBruto() * itemPedido.getPercentualDesconto()));

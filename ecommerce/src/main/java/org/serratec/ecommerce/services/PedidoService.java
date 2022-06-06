@@ -124,6 +124,7 @@ public class PedidoService {
 		Pedido pedidoBD = findPedidoById(pedidoReqDTO.getIdPedido());
 
 		for (ItemPedido itemPedido : pedidoBD.getItemPedidoList()) {
+			itemPedido.getProduto().setQtdEstoque(itemPedido.getProduto().getQtdEstoque() + itemPedido.getQuantidade());
 			itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
 		}
 		
