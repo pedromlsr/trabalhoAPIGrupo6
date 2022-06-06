@@ -110,6 +110,10 @@ public class PedidoService {
 	}
 
 	public PedidoResDTO updatePedido(PedidoReqDTO pedidoReqDTO) {
+		if (pedidoReqDTO.getIdPedido() == null) {
+			throw new PedidoException("Não foi informado um ID");
+		}
+		
 		if (!pedidoRepository.existsById(pedidoReqDTO.getIdPedido())) {
 			throw new NoSuchElementFoundException("Não foi possível atualizar. O Pedido de id = "
 					+ pedidoReqDTO.getIdPedido() + " não foi encontrado.");

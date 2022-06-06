@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -30,10 +31,14 @@ public class ItemPedido {
     private Integer quantidade;
 
     @Column(name = "preco_venda")
+    @NotNull(message = "Insira um preço venda")
+    @Min(value = 0, message = "O valor mínimo do preço venda é 0")
     private Double precoVenda;
 
     @Column(name = "percentual_desconto")
     @NotNull(message="Insira um percertual de desconto")
+    @Min(value = 0, message = "O valor mínimo do percentual de desconto é 0")
+    @Max(value = 1, message = "O valor máximo do percentual de desconto é 1")
     private Double percentualDesconto;
 
     @Column(name = "valor_bruto")
