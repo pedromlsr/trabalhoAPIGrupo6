@@ -5,7 +5,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.serratec.ecommerce.dtos.ClienteDTO;
-import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.exceptions.ErrorResponse;
 import org.serratec.ecommerce.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,50 +35,51 @@ public class ClienteController {
 	ClienteService clienteService;
 
 	@GetMapping
-	@Operation(summary = "Busca todos os clientes cadastrados.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os clientes cadastrados.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ClienteDTO.class)))),
+	@Operation(summary = "Busca todos os clientes cadastrados no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Retorna todos os clientes cadastrados no sistema.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ClienteDTO.class)))),
 			@ApiResponse(responseCode = "404", description = "Falha. Nenhum cliente encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<List<ClienteDTO>> findAllCliente() {
 		return new ResponseEntity<>(clienteService.findAllCliente(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	@Operation(summary = "Busca um cliente cadastrado através do seu ID.", parameters = {
-			@Parameter(name = "id", description = "Id da categoria desejada.") }, responses = {
-					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna a categoria desejada.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
-					@ApiResponse(responseCode = "404", description = "Falha. Não há um cliente cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
+	@Operation(summary = "Busca um cliente cadastrado no sistema através do seu id.", parameters = {
+			@Parameter(name = "id", description = "Id do cliente desejado.") }, responses = {
+					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o cliente desejado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
+					@ApiResponse(responseCode = "404", description = "Falha. Nenhum cliente encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<ClienteDTO> findClienteByIdDTO(@PathVariable Integer id) {
 		return new ResponseEntity<>(clienteService.findClienteByIdDTO(id), HttpStatus.OK);
 	}
 
 	@PostMapping
-	@Operation(summary = "Cadastra um novo cliente.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo cliente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
-	public ResponseEntity<ClienteDTO> saveCliente(@Valid @RequestBody ClienteDTO clienteDTO) throws EnderecoException {
+	@Operation(summary = "Cadastra um novo cliente no sistema.", responses = {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo cliente no sistema e retorna seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
+	public ResponseEntity<ClienteDTO> saveCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
 		return new ResponseEntity<>(clienteService.saveCliente(clienteDTO), HttpStatus.CREATED);
 	}
 
 	@PutMapping
 	@Operation(summary = "Atualiza um cliente cadastrado.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o cliente desejado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um cliente com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
-	public ResponseEntity<ClienteDTO> updateCliente(@Valid @RequestBody ClienteDTO clienteDTO)
-			throws EnderecoException {
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o cliente desejado e retorna seus dados atualizados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum cliente encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
+	public ResponseEntity<ClienteDTO> updateCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
 		return new ResponseEntity<>(clienteService.updateCliente(clienteDTO), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Exclui um cliente cadastrado através do seu ID.", responses = {
 			@ApiResponse(responseCode = "200", description = "Sucesso. Exclui o cliente desejado.", content = @Content),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um cliente com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum cliente encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<String> deleteClienteById(@PathVariable Integer id) {
 		clienteService.deleteClienteById(id);
-		return new ResponseEntity<>("O Cliente de id: " + id + " foi deletado com sucesso!", HttpStatus.OK);
+		return new ResponseEntity<>("O Cliente de id = " + id + " foi excluído com sucesso.", HttpStatus.OK);
 	}
 
 }

@@ -35,7 +35,7 @@ public class PedidoService {
 
 	public List<PedidoResDTO> findAllPedido() {
 		if (pedidoRepository.findAll().isEmpty()) {
-			throw new NoSuchElementFoundException("Nenhum pedido encontrado.");
+			throw new NoSuchElementFoundException("Nenhum Pedido encontrado.");
 		} else {
 			List<PedidoResDTO> pedidoResDTOList = new ArrayList<>();
 
@@ -87,8 +87,12 @@ public class PedidoService {
 		pedido.setDataPedido(LocalDate.now());
 		pedido.setStatus(statusRepository.findById(1).get());
 		
+		if (pedidoReqDTO.getIdPedido() == null) {
+			throw new PedidoException("Não foi informado um id para o Cliente.");
+		}
+		
 		if (!clienteRepository.existsById(pedidoReqDTO.getIdCliente())) {
-			throw new NoSuchElementFoundException("Não foi encontrado um cliente com o Id: " + pedidoReqDTO.getIdCliente());
+			throw new NoSuchElementFoundException("O Cliente de id = " + pedidoReqDTO.getIdCliente() + " não foi encontrado.");
 		}
 		
 		pedido.setCliente(clienteRepository.findById(pedidoReqDTO.getIdCliente()).get());
@@ -109,7 +113,7 @@ public class PedidoService {
 
 	public PedidoResDTO updatePedido(PedidoReqDTO pedidoReqDTO) {
 		if (pedidoReqDTO.getIdPedido() == null) {
-			throw new PedidoException("Não foi informado um ID");
+			throw new PedidoException("Não foi informado um id para o Pedido.");
 		}
 		
 		if (!pedidoRepository.existsById(pedidoReqDTO.getIdPedido())) {

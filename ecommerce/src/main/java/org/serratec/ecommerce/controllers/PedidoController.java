@@ -43,10 +43,10 @@ public class PedidoController {
 	}
 
 	@GetMapping("/{id}")
-	@Operation(summary = "Busca um pedido cadastrado no sistema através do seu ID.", parameters = {
-			@Parameter(name = "id", description = "ID do pedido desejado.") }, responses = {
-					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o pedido que possui o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
-					@ApiResponse(responseCode = "404", description = "Falha. Não há um pedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+	@Operation(summary = "Busca um pedido cadastrado no sistema através do seu id.", parameters = {
+			@Parameter(name = "id", description = "Id do pedido desejado.") }, responses = {
+					@ApiResponse(responseCode = "200", description = "Sucesso. Retorna o pedido que possui o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
+					@ApiResponse(responseCode = "404", description = "Falha. Nenhum pedido encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 					@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<PedidoResDTO> findPedidoByIdDTO(@PathVariable Integer id) {
 		return new ResponseEntity<>(pedidoService.findPedidoByIdDTO(id), HttpStatus.OK);
@@ -55,6 +55,7 @@ public class PedidoController {
 	@PostMapping
 	@Operation(summary = "Cadastra um novo pedido no sistema e retorna seus dados.", responses = {
 			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra o pedido no sistema e retorna seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
 		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
@@ -62,9 +63,9 @@ public class PedidoController {
 
 	@PutMapping
 	@Operation(summary = "Atualiza um pedido cadastrado no sistema enquanto estiver em status de aguardando pagamento e retorna seus dados atualizados.", responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o pedido que possui o ID fornecido e retorna seus dados atualizados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
-			@ApiResponse(responseCode = "400", description = "Falha. Esta requisição só pode ser realizada enquanto o pedido estiver em status de 'Aguardando pagamento'.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um pedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o pedido que possui o id fornecido e retorna seus dados atualizados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum pedido encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<PedidoResDTO> updatePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
 		return new ResponseEntity<>(pedidoService.updatePedido(pedidoReqDTO), HttpStatus.OK);
@@ -72,11 +73,11 @@ public class PedidoController {
 
 	@PutMapping("/{idPedido}/{idStatus}")
 	@Operation(summary = "Atualiza o status de um pedido cadastrado no sistema e retorna seus dados atualizados.", parameters = {
-			@Parameter(name = "idPedido", description = "ID do pedido desejado."),
-			@Parameter(name = "idStatus", description = "ID do status para o qual será alterado.")}, responses = {
+			@Parameter(name = "idPedido", description = "Id do pedido desejado."),
+			@Parameter(name = "idStatus", description = "Id do status para o qual será alterado.")}, responses = {
 			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o status do pedido desejado e retorna seus dados atualizados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
-			@ApiResponse(responseCode = "400", description = "Falha. [Esta requisição só pode ser realizada para os status de id 2 e 3 ( Enviado e Entregue). | Não é possível definir como entregue um pedido que ainda não foi enviado. | Não é possível alterar o status de um pedido já finalizado. ]", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um pedido cadastrado no sistema que possua o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Falha. Erro na requisição.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Falha. Nenhum pedido encontrado no sistema com o id fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
 	public ResponseEntity<PedidoResDTO> updatePedidoStatus(@PathVariable Integer idPedido,
 			@PathVariable Integer idStatus) {

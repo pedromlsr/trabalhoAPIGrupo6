@@ -34,32 +34,33 @@ public class ClienteService {
 	ItemPedidoService itemPedidoService;
 
 	public List<ClienteDTO> findAllCliente() {
-		List<Cliente> listClienteEntidade = clienteRepository.findAll();
-		List<ClienteDTO> listClienteDTO = new ArrayList<ClienteDTO>();
+		List<Cliente> listCliente = clienteRepository.findAll();
+		List<ClienteDTO> listClienteDTO = new ArrayList<>();
 
-		if (listClienteEntidade.isEmpty()) {
-			throw new NoSuchElementFoundException("Nenhum cliente encontrado.");
+		if (listCliente.isEmpty()) {
+			throw new NoSuchElementFoundException("Nenhum Cliente encontrado.");
 		}
 
-		for (Cliente cliente : listClienteEntidade) {
-			listClienteDTO.add(EntidadeParaDTO(cliente));
+		for (Cliente cliente : listCliente) {
+			listClienteDTO.add(convertEntityToDto(cliente));
 		}
+		
 		return listClienteDTO;
 	}
 
-	public Cliente findClienteById(Integer idCliente) {
-		return clienteRepository.findById(idCliente).isPresent() ? clienteRepository.findById(idCliente).get() : null;
+	public Cliente findClienteById(Integer id) {
+		return clienteRepository.findById(id).get();
 	}
 
-	public ClienteDTO findClienteByIdDTO(Integer idCliente) {
-		if (!clienteRepository.existsById(idCliente)) {
-			throw new NoSuchElementFoundException("O cliente de Id = " + idCliente + " não foi encontrado.");
+	public ClienteDTO findClienteByIdDTO(Integer id) {
+		if (!clienteRepository.existsById(id)) {
+			throw new NoSuchElementFoundException("O Cliente de id = " + id + " não foi encontrado.");
 		}
 
-		return EntidadeParaDTO(clienteRepository.findById(idCliente).get());
+		return convertEntityToDto(clienteRepository.findById(id).get());
 	}
 
-	public ClienteDTO saveCliente(ClienteDTO clienteDTO) throws EnderecoException {
+	public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
 
 		Cliente clienteCpfExistente = clienteRepository.findByCpf(clienteDTO.getCpf());
 		Cliente clienteEmailExistente = clienteRepository.findByEmail(clienteDTO.getEmail());
@@ -88,11 +89,11 @@ public class ClienteService {
 			throw new ClienteException("Nome com apenas letras.");
 		} else {
 
-			Cliente novoCliente = clienteRepository.save(DTOParaEntidade(clienteDTO));
+			Cliente novoCliente = clienteRepository.save(convertDtoToEntity(clienteDTO));
 			EnderecoDTO endereco = enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(),
 					clienteDTO.getNumero(), clienteDTO.getComplemento());
 
-			clienteDTO = EntidadeParaDTO(clienteRepository.save(novoCliente));
+			clienteDTO = convertEntityToDto(clienteRepository.save(novoCliente));
 			clienteDTO.setIdEndereco(endereco.getIdEndereco());
 
 			return clienteDTO;
@@ -109,16 +110,16 @@ public class ClienteService {
 	}
 
 	public ClienteDTO updateCliente(ClienteDTO clienteDTO) throws EnderecoException {
-
 		if (clienteDTO.getIdCliente() == null) {
-			throw new ClienteException("Não foi informado um ID");
+			throw new ClienteException("Não foi informado um id para o Cliente.");
 		}
-		Cliente clienteBD = clienteRepository.findById(clienteDTO.getIdCliente()).isPresent()
+		
+		Cliente clienteBD = clienteRepository.existsById(clienteDTO.getIdCliente())
 				? clienteRepository.findById(clienteDTO.getIdCliente()).get()
 				: null;
 
 		if (clienteBD == null) {
-			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado.");
+			throw new NoSuchElementFoundException("O Cliente de id = " + clienteDTO.getIdCliente() + " não foi encontrado.");
 		}
 
 		Endereco endereco = clienteBD.getEndereco();
@@ -129,13 +130,13 @@ public class ClienteService {
 
 	}
 
-	public void deleteClienteById(Integer idCliente) {
+	public void deleteClienteById(Integer id) {
 
-		if (!clienteRepository.findById(idCliente).isPresent()) {
-			throw new NoSuchElementFoundException("Não foi encontrado um cliente para o ID informado.");
+		if (!clienteRepository.existsById(id)) {
+			throw new NoSuchElementFoundException("O Cliente de id = " + id + " não foi encontrado.");
 		}
 
-		Cliente clienteBD = clienteRepository.findById(idCliente).get();
+		Cliente clienteBD = clienteRepository.findById(id).get();
 
 		List<Pedido> pedidosCliente = pedidoRepository.findByCliente(clienteBD);
 
@@ -143,15 +144,16 @@ public class ClienteService {
 			for (ItemPedido itemPedido : pedido.getItemPedidoList()) {
 				itemPedidoService.deleteItemPedidoById(itemPedido.getIdItemPedido());
 			}
+			
 			pedidoRepository.deleteById(pedido.getIdPedido());
 		}
 
 		Endereco endereco = clienteBD.getEndereco();
-		clienteRepository.deleteById(idCliente);
+		clienteRepository.deleteById(id);
 		enderecoService.deleteByIdEndereco(endereco.getIdEndereco());
 	}
 
-	private Cliente DTOParaEntidade(ClienteDTO clienteDTO) {
+	private Cliente convertDtoToEntity(ClienteDTO clienteDTO) {
 		Cliente cliente = new Cliente();
 
 		cliente.setIdCliente(clienteDTO.getIdCliente());
@@ -166,7 +168,7 @@ public class ClienteService {
 		return cliente;
 	}
 
-	private ClienteDTO EntidadeParaDTO(Cliente cliente) {
+	private ClienteDTO convertEntityToDto(Cliente cliente) {
 		ClienteDTO clienteDTO = new ClienteDTO();
 
 		clienteDTO.setIdCliente(cliente.getIdCliente());
