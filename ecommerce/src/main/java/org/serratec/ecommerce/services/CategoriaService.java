@@ -41,7 +41,7 @@ public class CategoriaService {
 	public Categoria saveCategoria(Categoria categoria) {
 
 		if (findCategoriaByNome(categoria) != null)
-			throw new CategoriaException("Já possui uma categoria cadastrada com essa descrição");
+			throw new CategoriaException("Já possui uma categoria cadastrada com esse nome.");
 
 		return categoriaRepository.save(categoria);
 	}
@@ -64,7 +64,7 @@ public class CategoriaService {
 
 			if (categoriaAtualizada.getIdCategoria() != categoriaBD.getIdCategoria()) {
 				throw new CategoriaException(
-						"A categoria de ID: " + categoriaBD.getIdCategoria() + " já possui essa descrição");
+						"A categoria de ID: " + categoriaBD.getIdCategoria() + " já possui esse nome.");
 			}
 		}
 		return categoriaRepository.save(categoria);
