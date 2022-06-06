@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -32,12 +33,12 @@ public class ItemPedido {
 
     @Column(name = "preco_venda")
     @NotNull(message = "Insira um preço venda")
-    @Min(value = 0, message = "O valor mínimo do preço venda é 0")
+    @PositiveOrZero(message = "O valor do preço venda não pode ser negativo.")
     private Double precoVenda;
 
     @Column(name = "percentual_desconto")
     @NotNull(message="Insira um percertual de desconto")
-    @Min(value = 0, message = "O valor mínimo do percentual de desconto é 0")
+    @PositiveOrZero(message = "O valor do percentual de desconto não pode ser negativo.")
     @Max(value = 1, message = "O valor máximo do percentual de desconto é 1")
     private Double percentualDesconto;
 
