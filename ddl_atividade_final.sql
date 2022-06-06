@@ -20,15 +20,22 @@ id_endereco INTEGER,
 FOREIGN KEY(id_endereco) REFERENCES endereco(id_endereco)
 );
 
+CREATE TABLE status (
+id_status SERIAL primary key,
+desc_status varchar(30) not null
+);
+
 CREATE TABLE pedido (
 id_pedido SERIAL PRIMARY KEY,
 data_pedido DATE NOT NULL,
 data_entrega DATE, 
 data_envio DATE,
-status boolean, --ativo/inativo
+id_status INTEGER,
+FOREIGN KEY(id_status) REFERENCES status(id_status),
 id_cliente INTEGER, 
 FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
 );
+
 
 CREATE TABLE categoria (
 id_categoria SERIAL PRIMARY KEY, 
