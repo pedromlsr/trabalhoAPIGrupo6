@@ -10,7 +10,6 @@ import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.services.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,9 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+
 
 
 
@@ -64,16 +62,6 @@ public class CategoriaController {
 		return new ResponseEntity<>(novoCategoriaDTO, HttpStatus.CREATED);
 	}
 	
-	@PostMapping(value = "/com-foto", consumes = 
-			{MediaType.APPLICATION_JSON_VALUE, 
-			MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<Categoria> saveCategoriaComFoto(
-			@RequestPart("categoria") String categoria,
-			@RequestPart("file") MultipartFile file) throws Exception {
-		
-		Categoria novaCategoria = categoriaService.saveCategoriaComFoto(categoria, file);
-		return new ResponseEntity<>(novaCategoria, HttpStatus.CREATED);
-	}
 	@PutMapping
 	public ResponseEntity<Categoria> updateCategoria(@Valid @RequestBody Categoria categoria) {
 		Categoria novaCategoria = categoriaService.updateCategoria(categoria);
