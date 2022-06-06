@@ -78,7 +78,7 @@ public class CategoriaController {
 	public ResponseEntity<String> deleteCategoriaById(@PathVariable Integer id) {
 		categoriaService.deleteCategoriaById(id);
 		
-		return new ResponseEntity<>("", HttpStatus.OK);
+		return new ResponseEntity<>("A Categoria de id = " + id + " foi excluída com sucesso.", HttpStatus.OK);
 	}
 
 }
