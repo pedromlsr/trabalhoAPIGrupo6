@@ -88,6 +88,11 @@ public class PedidoService {
 
 		pedido.setDataPedido(LocalDate.now());
 		pedido.setStatus(statusRepository.findById(1).get());
+		
+		if (!clienteRepository.existsById(pedidoReqDTO.getIdCliente())) {
+			throw new NoSuchElementFoundException("Não foi encontrado um cliente com o Id: " + pedidoReqDTO.getIdCliente());
+		}
+		
 		pedido.setCliente(clienteRepository.findById(pedidoReqDTO.getIdCliente()).get());
 
 		Pedido pedidoSave = pedidoRepository.save(pedido);
