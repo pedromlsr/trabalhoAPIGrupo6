@@ -87,7 +87,7 @@ public class PedidoService {
 		pedido.setDataPedido(LocalDate.now());
 		pedido.setStatus(statusRepository.findById(1).get());
 		
-		if (pedidoReqDTO.getIdPedido() == null) {
+		if (pedidoReqDTO.getIdCliente() == null) {
 			throw new PedidoException("Não foi informado um id para o Cliente.");
 		}
 		
