@@ -28,13 +28,26 @@ public class ItemPedidoService {
 	}
 
 	public List<ItemPedidoDTO> findAllItemPedidoDTO() {
+		if (itemPedidoRepository.findAll().isEmpty()) {
+			throw new NoSuchElementFoundException("Nenhum ItemPedido encontrado.");
+		}
+
 		List<ItemPedidoDTO> listItemPedidoDTO = new ArrayList<>();
+		
 		for (ItemPedido itemPedido : itemPedidoRepository.findAll()) {
 
 			listItemPedidoDTO.add(convertEntityToDto(itemPedido));
 		}
 
 		return listItemPedidoDTO;
+	}
+	
+	public ItemPedidoDTO findItemPedidoByIdDTO(Integer id) {
+		if(!itemPedidoRepository.existsById(id)) {
+			throw new NoSuchElementFoundException("O ItemPedido de id = " + id + " não foi encontrado.");
+		}
+		
+		return convertEntityToDto(itemPedidoRepository.findById(id).get());
 	}
 
 	public PedidoReqDTO salvarItemPedido(PedidoReqDTO pedidoReqDTO) {
@@ -82,21 +95,5 @@ public class ItemPedidoService {
 
 		return itemPedidoDTO;
 	}
-
-//
-//	public ItemPedido findItemPedidoById(Integer idItemPedido) {
-//		return itemPedidoRepository.findById(idItemPedido).isPresent()
-//				? itemPedidoRepository.findById(idItemPedido).get()
-//				: null;
-//	}
-//
-//	public ItemPedido saveItemPedido(ItemPedido itemPedido) {
-//		return itemPedidoRepository.save(itemPedido);
-//	}
-//
-//	public ItemPedido updateItemPedido(ItemPedido itemPedido) {
-//		return itemPedidoRepository.save(itemPedido);
-//	}
-//
 
 }
