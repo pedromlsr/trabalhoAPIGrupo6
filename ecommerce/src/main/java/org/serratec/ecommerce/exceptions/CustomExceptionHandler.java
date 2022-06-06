@@ -115,5 +115,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro da categoria.", details);
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(ItemPedidoException.class)
+	public final ResponseEntity<Object> handleCategoriaException(ItemPedidoException ex, WebRequest request) {
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		ErrorResponse error = new ErrorResponse(httpStatus.value(), "Erro no cadastro do ItemPedido.", details);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
 
 }
