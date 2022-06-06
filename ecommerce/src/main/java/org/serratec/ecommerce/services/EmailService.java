@@ -7,7 +7,6 @@ import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.entities.ItemPedido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -40,63 +39,50 @@ public class EmailService {
 		this.javaMailSender = javaMailSender;
 	}
 
-	public void enviarEmailTexto(PedidoReqDTO pedidoReqDTO) {
-		SimpleMailMessage email = new SimpleMailMessage();
-
-		email.setFrom("grupo6serratec2022.1@outlook.com");
-		email.setTo("grupo6serratec2022.1@outlook.com");
-//		email.setTo(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getEmail());
-		email.setSubject("Pedido: " + pedidoReqDTO.getIdPedido());
-		email.setText(montarCorpoEmail(pedidoReqDTO));
-
-//		Podemos definir o email do remente no arquivo de propriedades ou configurar aqui sempre que quiser
-//		Cuidado no momento de usar um servidor real, para setar um remetente válido abaixo
-
-		javaMailSender.send(email);
-
-	}
-
-	public void enviarEmailHtml(PedidoReqDTO pedidoReqDTO) throws MessagingException {
+	public void enviarEmailHtml(PedidoReqDTO pedidoReqDTO) {
+		try {
 		MimeMessage email = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(email, "utf-8");
-//		String htmlMsg = "";
 		
 		helper.setFrom("grupo6serratec2022.1@outlook.com");
 		helper.setTo("grupo6serratec2022.1@outlook.com");
-		helper.setSubject("Pedido: " + pedidoReqDTO.getIdPedido());
+//		helper.setTo(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getEmail());
+		helper.setSubject("Ecommerce Serratec - Seu Pedido: Nº " + pedidoReqDTO.getIdPedido());
 		helper.setText(montarCorpoEmail(pedidoReqDTO), true);
 		javaMailSender.send(email);
-		
+		} catch (MessagingException e) {
+			System.out.println("Erro ao enviar o email.");
+		}
 	}
 
 	private String montarCorpoEmail(PedidoReqDTO pedidoReqDTO) {
-//		List<String> listaNomeProduto = new ArrayList<>();
-//		List<String> listaDescProduto = new ArrayList<>();
-//		List<Integer> listaQuantProduto = new ArrayList<>();
-		
 		String produtoEmail = "";
 		
 		for (ItemPedido itemPedido : pedidoReqDTO.getItemPedidoList()) {
-//			listaNomeProduto.add(itemPedido.getProduto().getNomeProduto());
-//			listaDescProduto.add(itemPedido.getProduto().getDescricaoProduto());
-//			listaQuantProduto.add(itemPedido.getQuantidade());
-
-			produtoEmail += "> " + itemPedido.getProduto().getNomeProduto() + " --- x" + itemPedido.getQuantidade() + " --- R$ " + String.format("%.2f", itemPedido.getValorLiquido()) + "<br>";
+			produtoEmail += "> ID: " + itemPedido.getProduto().getIdProduto() +
+							" --- Nome: " + itemPedido.getProduto().getNomeProduto() +
+							" --- Preço: " + String.format("%.2f", itemPedido.getPrecoVenda()) +
+							" --- Qtd.: x" + itemPedido.getQuantidade() +
+							" --- Desconto: R$ " + String.format("%.2f", itemPedido.getPrecoVenda() * itemPedido.getPercentualDesconto() * itemPedido.getQuantidade()) +
+							" --- Total: R$ " + String.format("%.2f", itemPedido.getValorLiquido()) + "<br><br>";
 		}
 		
-		
 		String corpoEmail =
-				"<h3>Olá, " + clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getNomeCompleto() + "!</h3><br>" +
+				"<style>body {background-image: url('https://st2.depositphotos.com/1310390/6034/v/950/depositphotos_60341437-stock-illustration-sale-background-with-shopping-bags.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: cover;}" +
+				"div {padding: 10px;} p {font-size: 30px;}</style>" +
+				"<div><h1>Olá, " + clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getNomeCompleto() + "!</h1><br>" +
 				"<p>Seu pedido foi realizado com sucesso!</p>" +
-				"<p>Os produtos serão enviados assim que o pagamento for confirmado.</p><br><hr>" +
-				"<h3>Dados do comprador:</h3><br>" +
-				"<p>Info:</p>" +
+				"<p>Os produtos serão enviados assim que o pagamento for confirmado.</p>" +
+				"<p>Número do pedido: " + pedidoReqDTO.getIdPedido() + "</p><br><hr>" +
+				"<h1>Dados do comprador:</h1><br>" +
+				"<h1>Info:</h1>" +
 				"<p>" + clienteService.findClienteById(pedidoReqDTO.getIdCliente()) + "</p><br>" +
-				"<p>Endereço:</p>" +
+				"<h1>Endereço:</h1>" +
 				"<p>" + enderecoService.findEnderecoById(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getEndereco().getIdEndereco()) + "<p><br><hr>" +
-				"<h3>Produtos:</h3><br>" + 
+				"<h1>Produtos:</h1><br>" + 
 				"<p>" + produtoEmail + "</p>" +
-				"<p><b>Total: R$ " + String.format("%.2f", pedidoReqDTO.getValorLiqTotal()) + "</b></p>";
+				"<p><b>Valor da compra: R$ " + String.format("%.2f", pedidoReqDTO.getValorLiqTotal()) + "</b></p><br><hr>" +
+				"<h1>Obrigado pela preferência! :)</h1></div>";
 
 		return corpoEmail;
 	}

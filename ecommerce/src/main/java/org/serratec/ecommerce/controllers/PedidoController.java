@@ -2,8 +2,6 @@ package org.serratec.ecommerce.controllers;
 
 import java.util.List;
 
-import javax.mail.MessagingException;
-
 import org.serratec.ecommerce.dtos.PedidoReqDTO;
 import org.serratec.ecommerce.dtos.PedidoResDTO;
 import org.serratec.ecommerce.exceptions.ErrorResponse;
@@ -58,7 +56,7 @@ public class PedidoController {
 	@Operation(summary = "Cadastra um novo pedido no sistema e retorna seus dados.", responses = {
 			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra o pedido no sistema e retorna seus dados.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoResDTO.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
-	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) throws MessagingException {
+	public ResponseEntity<PedidoResDTO> savePedido(@RequestBody PedidoReqDTO pedidoReqDTO) {
 		return new ResponseEntity<>(pedidoService.savePedido(pedidoReqDTO), HttpStatus.CREATED);
 	}
 

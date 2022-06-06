@@ -42,6 +42,11 @@ public class Cliente {
 	@JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco")
 	private Endereco endereco;
 
+	@Override
+	public String toString() {
+		return "Nome: " + nomeCompleto + "<br> CPF: " + cpf + "<br> Telefone: " + telefone + "<br> Email: " + email;
+	}
+
 	public Integer getIdCliente() {
 		return idCliente;
 	}
@@ -96,11 +101,6 @@ public class Cliente {
 
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
-	}
-	
-	@Override
-	public String toString() {
-		return nomeCompleto + "<br>" + cpf + "<br>" + telefone + "<br>" + email;
 	}
 
 }
