@@ -82,18 +82,7 @@ public class ProdutoController {
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ProdutoGetDTO> updateProduto(@Valid @RequestBody ProdutoPostDTO produtoDto) {
 		return new ResponseEntity<>(produtoService.updateProduto(produtoDto), HttpStatus.OK);
-	}
-
-	@PutMapping("/{id}")
-	@Operation(summary = "Atualiza um produto cadastrado através do seu ID.", parameters = {
-		@Parameter(name = "id", description = "Id do produto desejado.") }, responses = {
-			@ApiResponse(responseCode = "200", description = "Sucesso. Atualiza o produto desejado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoGetDTO.class))),
-			@ApiResponse(responseCode = "404", description = "Falha. Não há um produto cadastrado com o ID fornecido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
-	public ResponseEntity<ProdutoGetDTO> updateProdutoById(@PathVariable Integer id,
-	@Valid @RequestBody ProdutoPostDTO produtoDto) {
-		return new ResponseEntity<>(produtoService.updateProdutoById(produtoDto, id), HttpStatus.OK);
-	}
+	}	
 
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Exclui um produto cadastrado através do seu ID.", parameters = {
@@ -103,7 +92,7 @@ public class ProdutoController {
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<String> deleteProdutoById(@PathVariable Integer id) {
 		produtoService.deleteProdutoById(id);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>("O Produto de id = " + id + " foi excluído com sucesso.",HttpStatus.OK);
 	}
 
 }

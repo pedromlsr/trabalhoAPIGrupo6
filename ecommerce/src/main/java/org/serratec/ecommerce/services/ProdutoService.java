@@ -101,13 +101,6 @@ public class ProdutoService {
 		return convertEntityToDto(produtoRepository.save(produtoAtualizado));
 	}
 
-	public ProdutoGetDTO updateProdutoById(ProdutoPostDTO produtoDto, Integer id) {
-		
-		produtoDto.setIdProduto(id);
-
-		return updateProduto(produtoDto);
-	}
-
 	public void deleteProdutoById(Integer id) {
 		if (findProdutoByIdDTO(id) == null) {
 			throw new NoSuchElementFoundException("Não foi encontrado um produto para o id: " + id);

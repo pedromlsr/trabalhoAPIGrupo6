@@ -55,7 +55,7 @@ public class ClienteController {
 	}
 
 	@PostMapping
-	@Operation(summary = "Cadastra uma nova categoria.", responses = {
+	@Operation(summary = "Cadastra um novo cliente.", responses = {
 			@ApiResponse(responseCode = "200", description = "Sucesso. Cadastra um novo cliente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteDTO.class))),
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<ClienteDTO> saveCliente(@Valid @RequestBody ClienteDTO clienteDTO) throws EnderecoException {
@@ -79,7 +79,7 @@ public class ClienteController {
 			@ApiResponse(responseCode = "500", description = "Falha. Erro inesperado.", content = @Content) })
 	public ResponseEntity<String> deleteClienteById(@PathVariable Integer id) {
 		clienteService.deleteClienteById(id);
-		return new ResponseEntity<>("", HttpStatus.OK);
+		return new ResponseEntity<>("O Cliente de id: " + id + " foi deletado com sucesso!", HttpStatus.OK);
 	}
 
 }
