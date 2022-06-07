@@ -11,6 +11,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CPF;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class ClienteDTO {
 	private Integer idCliente;
 
@@ -32,6 +34,7 @@ public class ClienteDTO {
 
 	@NotNull(message = "Campo data de nascimento não informado.")
 	@Past(message = "A data de nascimento tem que estar no passado.")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private LocalDate dataNascimento;
 	
 	@NotNull(message = "Campo CEP não informado.")

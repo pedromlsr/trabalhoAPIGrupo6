@@ -27,46 +27,42 @@ public class EnderecoService {
 
 	public List<EnderecoDTO> findAllEndereco() {
 		if (enderecoRepository.findAll().isEmpty()) {
-			throw new NoSuchElementFoundException("Nenhum endereço encontrado");
+			throw new NoSuchElementFoundException("Nenhum endereço encontrado.");
 		} else {
 			List<EnderecoDTO> enderecoDTOList = new ArrayList<>();
 
 			for (Endereco endereco : enderecoRepository.findAll()) {
-				enderecoDTOList.add(EntidadeParaDTO(endereco));
+				enderecoDTOList.add(convertEntityToDto(endereco));
 			}
 			return enderecoDTOList;
 		}
 	}
 
 	public Endereco findEnderecoById(Integer idEndereco) {
-		if (enderecoRepository.findById(idEndereco).isPresent()) {
-			return enderecoRepository.findById(idEndereco).isPresent() ? enderecoRepository.findById(idEndereco).get()
-					: null;
-		} else {
+		if (!enderecoRepository.existsById(idEndereco)) {
 			throw new NoSuchElementFoundException("O endereço de id = " + idEndereco + " não foi encontrado.");
 		}
+
+		return enderecoRepository.findById(idEndereco).get();
 	}
 
 	public EnderecoDTO findEnderecoByIdDTO(Integer idEndereco) {
-		if (enderecoRepository.findById(idEndereco).isPresent()) {
-			return enderecoRepository.findById(idEndereco).isPresent()
-					? EntidadeParaDTO(enderecoRepository.findById(idEndereco).get())
-					: null;
-		} else {
+		if (!enderecoRepository.existsById(idEndereco)) {
 			throw new NoSuchElementFoundException("O endereço de id = " + idEndereco + " não foi encontrado.");
 		}
+
+		return convertEntityToDto(enderecoRepository.findById(idEndereco).get());
 	}
 
 	public EnderecoDTO saveEnderecoDTO(Integer idCliente, String cep, String numero, String complemento) {
 		String limpezaCep = cep.replaceAll("[.-]", "");
 
-		if (!clienteRepository.findById(idCliente).isPresent()) {
-			throw new NoSuchElementFoundException(
-					"O cliente de id = " + idCliente + " não foi encontrado");
+		if (!clienteRepository.existsById(idCliente)) {
+			throw new NoSuchElementFoundException("O cliente de id = " + idCliente + " não foi encontrado.");
 		}
 
 		if (limpezaCep.length() != 8) {
-			throw new EnderecoException("O CEP informado é inválido. O CEP deve conter 8 números");
+			throw new EnderecoException("O CEP informado é inválido. O CEP deve conter 8 números.");
 		}
 
 		if (numero == null) {
@@ -83,7 +79,7 @@ public class EnderecoService {
 		endereco.setComplemento(complemento);
 		endereco.setCep(limpezaCep);
 
-		EnderecoDTO novoEndereco = EntidadeParaDTO(enderecoRepository.save(endereco));
+		EnderecoDTO novoEndereco = convertEntityToDto(enderecoRepository.save(endereco));
 
 		Cliente cliente = clienteRepository.findById(idCliente).get();
 		cliente.setEndereco(endereco);
@@ -93,18 +89,18 @@ public class EnderecoService {
 	}
 
 	public EnderecoDTO updateEnderecoDTO(Integer idEndereco, EnderecoDTO enderecoDTO) {
-		if (!enderecoRepository.findById(idEndereco).isPresent()) {
-			throw new NoSuchElementFoundException("O endereço com id =" + idEndereco + " não foi encontrado");
+		if (!enderecoRepository.existsById(idEndereco)) {
+			throw new NoSuchElementFoundException("O endereço com id =" + idEndereco + " não foi encontrado.");
 		}
 
 		enderecoDTO.setIdEndereco(idEndereco);
 		String limpezaCep = enderecoDTO.getCep().replaceAll("[.-]", "");
 
 		if (limpezaCep.length() != 8) {
-			throw new EnderecoException("O CEP informado é inválido. O CEP deve conter 8 números");
+			throw new EnderecoException("O CEP informado é inválido. O CEP deve conter 8 números.");
 		}
 
-		return EntidadeParaDTO(enderecoRepository.save(DTOParaEntidade(enderecoDTO)));
+		return convertEntityToDto(enderecoRepository.save(convertDtoToEntity(enderecoDTO)));
 	}
 
 	public void deleteByIdEndereco(Integer idEndereco) {
@@ -116,11 +112,11 @@ public class EnderecoService {
 			}
 
 		}
-		if (!enderecoRepository.findById(idEndereco).isPresent()) {
-			throw new NoSuchElementFoundException("O endereço com id =" + idEndereco + " não foi encontrado");
+		if (!enderecoRepository.existsById(idEndereco)) {
+			throw new NoSuchElementFoundException("O endereço com id =" + idEndereco + " não foi encontrado.");
 		} else if (!listaIdEnderecosCadastrados.isEmpty()) {
 			throw new EnderecoException(
-					"Não foi possível excluir esse endereço, existem clientes com esse endereço cadastrado");
+					"Não foi possível excluir esse endereço, existem clientes com esse endereço cadastrado.");
 		} else {
 			enderecoRepository.deleteById(idEndereco);
 		}
@@ -138,7 +134,7 @@ public class EnderecoService {
 		return cadastroCepDTO;
 	}
 
-	private Endereco DTOParaEntidade(EnderecoDTO enderecoDTO) {
+	private Endereco convertDtoToEntity(EnderecoDTO enderecoDTO) {
 		Endereco endereco = new Endereco();
 
 		endereco.setBairro(enderecoDTO.getBairro());
@@ -151,7 +147,7 @@ public class EnderecoService {
 		return endereco;
 	}
 
-	private EnderecoDTO EntidadeParaDTO(Endereco endereco) {
+	private EnderecoDTO convertEntityToDto(Endereco endereco) {
 		EnderecoDTO enderecoDTO = new EnderecoDTO();
 
 		enderecoDTO.setIdEndereco(endereco.getIdEndereco());

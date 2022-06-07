@@ -12,7 +12,6 @@ import org.serratec.ecommerce.entities.Endereco;
 import org.serratec.ecommerce.entities.ItemPedido;
 import org.serratec.ecommerce.entities.Pedido;
 import org.serratec.ecommerce.exceptions.ClienteException;
-import org.serratec.ecommerce.exceptions.EnderecoException;
 import org.serratec.ecommerce.exceptions.NoSuchElementFoundException;
 import org.serratec.ecommerce.repositories.ClienteRepository;
 import org.serratec.ecommerce.repositories.PedidoRepository;
@@ -61,7 +60,8 @@ public class ClienteService {
 	}
 
 	public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
-
+		clienteDTO.getCpf().replaceAll("[.-]", "");
+		
 		Cliente clienteCpfExistente = clienteRepository.findByCpf(clienteDTO.getCpf());
 		Cliente clienteEmailExistente = clienteRepository.findByEmail(clienteDTO.getEmail());
 
@@ -109,7 +109,7 @@ public class ClienteService {
 		return matcher.find();
 	}
 
-	public ClienteDTO updateCliente(ClienteDTO clienteDTO) throws EnderecoException {
+	public ClienteDTO updateCliente(ClienteDTO clienteDTO) {
 		if (clienteDTO.getIdCliente() == null) {
 			throw new ClienteException("Não foi informado um id para o Cliente.");
 		}
