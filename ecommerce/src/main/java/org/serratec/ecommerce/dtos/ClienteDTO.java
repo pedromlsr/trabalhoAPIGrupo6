@@ -7,7 +7,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -28,22 +27,21 @@ public class ClienteDTO {
 	private String cpf;
 
 	@NotBlank(message = "Campo telefone não informado.")
-	@Size(min = 10, max = 11, message = "O campo telefone deve conter 10 ou 11 digitos.")
-	@Pattern(regexp = "[0-9]{10}|[0-9]{11}", message = "Confira o padrão do campo telefone.")
 	private String telefone;
 
 	@NotNull(message = "Campo data de nascimento não informado.")
 	@Past(message = "A data de nascimento tem que estar no passado.")
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private LocalDate dataNascimento;
-	
+
 	@NotNull(message = "Campo CEP não informado.")
+	@Pattern(regexp = "[0-9]{2}[.]?[0-9]{3}[-]?[0-9]{3}", message = "Confira o padrão do campo CEP (00.000-00).")
 	private String cep;
-	
+
 	private String numero;
-	
+
 	private String complemento;
-	
+
 	private Integer idEndereco;
 
 	public Integer getIdEndereco() {
@@ -125,6 +123,5 @@ public class ClienteDTO {
 	public void setCep(String cep) {
 		this.cep = cep;
 	}
-
 
 }

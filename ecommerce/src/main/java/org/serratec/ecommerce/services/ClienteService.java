@@ -61,6 +61,7 @@ public class ClienteService {
 
 	public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
 		clienteDTO.setCpf(clienteDTO.getCpf().replaceAll("[.-]", ""));
+		clienteDTO.setTelefone(clienteDTO.getTelefone().replaceAll("[-() ]",""));
 		
 		Cliente clienteCpfExistente = clienteRepository.findByCpf(clienteDTO.getCpf());
 		Cliente clienteEmailExistente = clienteRepository.findByEmail(clienteDTO.getEmail());
@@ -87,7 +88,12 @@ public class ClienteService {
 		}
 		if (!clienteDTO.getNomeCompleto().matches("[a-zA-Z][a-zA-Z ]*")) {
 			throw new ClienteException("Nome com apenas letras.");
-		} else {
+		} 
+		
+		if(clienteDTO.getTelefone().length()>11 ||clienteDTO.getTelefone().length()<10 ) {
+			throw new ClienteException("O campo telefone deve conter 10 ou 11 digitos.");
+		}
+		else {
 
 			Cliente novoCliente = clienteRepository.save(convertDtoToEntity(clienteDTO));
 			EnderecoDTO endereco = enderecoService.saveEnderecoDTO(novoCliente.getIdCliente(), clienteDTO.getCep(),
