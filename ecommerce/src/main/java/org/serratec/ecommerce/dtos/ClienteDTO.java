@@ -1,6 +1,6 @@
 package org.serratec.ecommerce.dtos;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -10,8 +10,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CPF;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ClienteDTO {
 	private Integer idCliente;
@@ -34,8 +32,7 @@ public class ClienteDTO {
 
 	@NotNull(message = "Campo data de nascimento não informado.")
 	@Past(message = "A data de nascimento tem que estar no passado.")
-	@JsonFormat(pattern = "dd/MM/yyyy")
-	private Date dataNascimento;
+	private LocalDate dataNascimento;
 	
 	@NotNull(message = "Campo CEP não informado.")
 	private String cep;
@@ -110,11 +107,11 @@ public class ClienteDTO {
 		this.telefone = telefone;
 	}
 
-	public Date getDataNascimento() {
+	public LocalDate getDataNascimento() {
 		return dataNascimento;
 	}
 
-	public void setDataNascimento(Date dataNascimento) {
+	public void setDataNascimento(LocalDate dataNascimento) {
 		this.dataNascimento = dataNascimento;
 	}
 
