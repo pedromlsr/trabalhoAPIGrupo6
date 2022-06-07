@@ -53,6 +53,8 @@ public class ItemPedidoService {
 
 	public PedidoReqDTO salvarItemPedido(PedidoReqDTO pedidoReqDTO) {
 
+		pedidoReqDTO.setValorLiqTotal(0.00);
+		
 		for (ItemPedido itemPedido : pedidoReqDTO.getItemPedidoList()) {
 
 			Integer idProdutoItemPedido = itemPedido.getProduto().getIdProduto();

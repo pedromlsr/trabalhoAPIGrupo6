@@ -11,10 +11,10 @@ public class PedidoResDTO {
 	private LocalDate dataPedido;
 
 	@JsonFormat(pattern = "dd/MM/yyyy")
-	private LocalDate dataEntrega;
+	private LocalDate dataEnvio;
 
 	@JsonFormat(pattern = "dd/MM/yyyy")
-	private LocalDate dataEnvio;
+	private LocalDate dataEntrega;
 
 	private String descricaoStatus;
 

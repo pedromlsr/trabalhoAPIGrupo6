@@ -45,8 +45,8 @@ public class EmailService {
 		MimeMessageHelper helper = new MimeMessageHelper(email, "utf-8");
 		
 		helper.setFrom("grupo6serratec2022.1@outlook.com");
-		helper.setTo("grupo6serratec2022.1@outlook.com");
-//		helper.setTo(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getEmail());
+//		helper.setTo("grupo6serratec2022.1@outlook.com");
+		helper.setTo(clienteService.findClienteById(pedidoReqDTO.getIdCliente()).getEmail());
 		helper.setSubject("Ecommerce Serratec - Seu Pedido: Nº " + pedidoReqDTO.getIdPedido());
 		helper.setText(montarCorpoEmail(pedidoReqDTO), true);
 		javaMailSender.send(email);
