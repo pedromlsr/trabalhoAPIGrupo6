@@ -90,7 +90,7 @@ public class ClienteService {
 			throw new ClienteException("Nome com apenas letras.");
 		} 
 		
-		if(clienteDTO.getTelefone().length()>11 ||clienteDTO.getTelefone().length()<10 ) {
+		if(clienteDTO.getTelefone().length() > 11 || clienteDTO.getTelefone().length() < 10) {
 			throw new ClienteException("O campo telefone deve conter 10 ou 11 digitos.");
 		}
 		else {
