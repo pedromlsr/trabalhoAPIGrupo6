@@ -60,7 +60,7 @@ public class ClienteService {
 	}
 
 	public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
-		clienteDTO.getCpf().replaceAll("[.-]", "");
+		clienteDTO.setCpf(clienteDTO.getCpf().replaceAll("[.-]", ""));
 		
 		Cliente clienteCpfExistente = clienteRepository.findByCpf(clienteDTO.getCpf());
 		Cliente clienteEmailExistente = clienteRepository.findByEmail(clienteDTO.getEmail());

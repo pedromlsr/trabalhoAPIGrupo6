@@ -73,8 +73,7 @@ public class EnderecoService {
 			complemento = "";
 		}
 
-		CadastroEnderecoDTO cadCepDTO = consultarEnderecoPorCep(limpezaCep);
-		Endereco endereco = cepDTOParaEndereco(cadCepDTO);
+		Endereco endereco = cepDTOParaEndereco(consultarEnderecoPorCep(limpezaCep));
 		endereco.setNumero(numero);
 		endereco.setComplemento(complemento);
 		endereco.setCep(limpezaCep);
