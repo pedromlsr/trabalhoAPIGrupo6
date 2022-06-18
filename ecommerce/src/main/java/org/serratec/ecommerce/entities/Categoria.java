@@ -1,10 +1,13 @@
 package org.serratec.ecommerce.entities;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
@@ -27,6 +30,9 @@ public class Categoria {
 	@Column(name = "descricao")
 	@NotBlank(message="A descrição da categoria não pode estar em branco")
 	private String descricaoCategoria;
+	
+	@OneToMany(mappedBy = "categoria")
+	private List<Produto> ProdutoList;
 
 	public Integer getIdCategoria() {
 		return idCategoria;
@@ -50,6 +56,14 @@ public class Categoria {
 
 	public void setDescricaoCategoria(String descricaoCategoria) {
 		this.descricaoCategoria = descricaoCategoria;
+	}
+
+	public List<Produto> getProdutoList() {
+		return ProdutoList;
+	}
+
+	public void setProdutoList(List<Produto> produtoList) {
+		ProdutoList = produtoList;
 	}
 
 }
