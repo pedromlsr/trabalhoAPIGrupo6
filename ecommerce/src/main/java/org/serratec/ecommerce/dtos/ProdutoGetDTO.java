@@ -14,6 +14,7 @@ public class ProdutoGetDTO {
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private LocalDate dataCadastro;	
 	private String nomeCategoria;
+	private String nomeImagemProduto;
 
 	public Integer getIdProduto() {
 		return idProduto;
@@ -70,4 +71,12 @@ public class ProdutoGetDTO {
 		this.nomeCategoria = nomeCategoria;
 	}
 
+	public String getNomeImagemProduto() {
+		return nomeImagemProduto;
+	}
+
+	public void setNomeImagemProduto(String img) {
+		this.nomeImagemProduto = img;
+	}
+	
 }

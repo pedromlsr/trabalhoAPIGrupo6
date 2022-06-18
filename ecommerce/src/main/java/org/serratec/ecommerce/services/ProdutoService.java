@@ -132,6 +132,8 @@ public class ProdutoService {
 		produtoDto.setDataCadastro(produto.getDataCadastro());
 		if (produto.getCategoria() != null)
 			produtoDto.setNomeCategoria(produto.getCategoria().getNomeCategoria());
+		if(produto.getNomeImagemProduto()!=null)
+			produtoDto.setNomeImagemProduto(produto.getNomeImagemProduto());
 
 		return produtoDto;
 	}
